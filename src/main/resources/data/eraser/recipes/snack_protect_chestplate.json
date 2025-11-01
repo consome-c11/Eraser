@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "N N",
+    "NNN",
+    "NNN"
+  ],
+  "key": {
+    "N": {
+      "item": "eraser:null_ingot"
+    }
+  },
+  "result": {
+    "item": "eraser:snack_protect_chestplate",
+    "count": 1
+  }
+}

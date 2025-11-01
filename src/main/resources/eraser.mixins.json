@@ -1,0 +1,29 @@
+{
+  "required": true,
+  "package": "com.test.eraser.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "refmap": "eraser.refmap.json",
+  "client": [
+    "client.CreativeModeInventoryScreenMixin",
+    "client.CreativeModeInventoryScreenAccess",
+    "client.ItemRendererMixin",
+    "client.ItemStackDisplayMixin",
+    "client.SetScreenMixin",
+    "snackprotector.GameRendererMixin"
+  ],
+  "mixins": [
+    "eraser.LivingEntityMixin",
+    "eraser.EntityMixin",
+    "eraser.ForgeHooksMixin",
+    "eraser.ForgeEventFactoryMixin",
+    "eraser.PersistentEntitySectionManagerAccessor",
+    "eraser.ServerLevelAccessor",
+    "eraser.ClassInstanceMultiMapAccessor",
+    "eraser.EntitySectionAccessor",
+    "eraser.LivingEntityAccessor",
+    "eraser.SynchedEntityDataAccessor",
+    "snackprotector.LivingEntityMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}
