@@ -18,6 +18,8 @@ import net.minecraft.world.item.TooltipFlag;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
+
 public class Eraser_Item extends SwordItem {
     public Eraser_Item(Properties props) {
         super(ModTiers.ERASER_TIER, 10, -2.4F, props.stacksTo(1).fireResistant());
@@ -25,10 +27,7 @@ public class Eraser_Item extends SwordItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        if (target instanceof ILivingEntity erased) {
-            erased.toolinstantKill(player);
-        }
-        target.kill();
+        killIfParentFound(target, player,7,32);
         return false;
     }
 

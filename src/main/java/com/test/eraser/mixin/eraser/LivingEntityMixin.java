@@ -92,7 +92,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                         if (part == self) {
                             if (e instanceof LivingEntity parent && parent instanceof ILivingEntity erasedParent) {
                                 erasedParent.instantKill(attacker,moredrop);
-                                return;
+                                //return;
                             }
                         }
                     }

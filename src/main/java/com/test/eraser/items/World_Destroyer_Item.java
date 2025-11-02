@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
+
 public class World_Destroyer_Item extends PickaxeItem {
     public World_Destroyer_Item(Properties props) {
         super(ModTiers.WORLD_DESTROYER_TIER, 1, -2.8F, props.stacksTo(1).fireResistant());
@@ -90,7 +92,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        if (target instanceof ILivingEntity target_)target_.toolinstantKill(player);
+        killIfParentFound(target, player,7,32);
         return false;
     }
 
