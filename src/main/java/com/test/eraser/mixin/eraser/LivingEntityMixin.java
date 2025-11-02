@@ -1,7 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.additional.ModDamageSources;
-import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.utils.SynchedEntityDataUtil;
@@ -13,24 +12,20 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ClassInstanceMultiMap;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.entity.EntityTickList;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.ForgeHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.damagesource.DamageSource;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -45,6 +40,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Unique
     private boolean erased = false;
+    @Unique
+    private boolean Fullset = false;
 
     @Override
     public boolean isErased() {
@@ -56,11 +53,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         this.erased = flag;
     }
 
-    @Unique
-    private boolean Fullset = false;
-
     @Override
-    public boolean wasFullset(){ return this.Fullset;}
+    public boolean wasFullset() {
+        return this.Fullset;
+    }
 
     @Override
     public void setwassFullset(boolean Fullset) {
@@ -84,7 +80,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Override
     public void instantKill(Player attacker, @Nullable int moredrop) {
-        LivingEntity self = (LivingEntity)(Object)this;
+        LivingEntity self = (LivingEntity) (Object) this;
         if (!self.isAlive()) return;
 
         List<Entity> nearby = self.level().getEntities(self, self.getBoundingBox().inflate(32));
@@ -96,7 +92,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                     for (Object part : arr) {
                         if (part == self) {
                             if (e instanceof LivingEntity parent && parent instanceof ILivingEntity erasedParent) {
-                                erasedParent.instantKill(attacker,moredrop);
+                                erasedParent.instantKill(attacker, moredrop);
                                 //return;
                             }
                         }
@@ -116,14 +112,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
             SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
             ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
-            ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int)Instant.now().getEpochSecond());
+            ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int) Instant.now().getEpochSecond());
             self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         } catch (Throwable t) {
             t.printStackTrace();
         }
 
         try {
-            forcedie(eraseSrc , moredrop);
+            forcedie(eraseSrc, moredrop);
             forceErase();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -135,14 +131,15 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //but can kill without calling on ChengeDimention lawl
     }
 
-    private void forcedie(DamageSource source , int moredrop) {
+    private void forcedie(DamageSource source, int moredrop) {
         LivingEntity self = (LivingEntity) (Object) this;
         ((LivingEntityAccessor) self).setDeadFlag(true);
         if (!self.level().isClientSide) {
             if (self instanceof ServerPlayer sp) {
                 Component deathMsg = sp.getCombatTracker().getDeathMessage();
                 sp.connection.send(new ClientboundPlayerCombatKillPacket(sp.getId(), deathMsg));
-                if(((LivingEntityAccessor) self).isDeadFlag())sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
+                if (((LivingEntityAccessor) self).isDeadFlag())
+                    sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
             }
             ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
         }
@@ -150,17 +147,19 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Override
     public void instantKill() {
-        instantKill((Player) null,1);
+        instantKill((Player) null, 1);
     }
 
     @Override
     public void toolinstantKill() {
-        instantKill((Player) null,7);
+        instantKill((Player) null, 7);
     }
+
     @Override
     public void toolinstantKill(Player player) {
-        instantKill(player,7);
+        instantKill(player, 7);
     }
+
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;

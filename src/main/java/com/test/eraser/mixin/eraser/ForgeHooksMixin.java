@@ -11,7 +11,6 @@ import net.minecraftforge.common.ForgeHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 
@@ -58,13 +57,13 @@ public class ForgeHooksMixin {
     private static void onGetLootingLevel(Entity target, Entity killer, DamageSource cause, CallbackInfoReturnable<Integer> cir) {
         if (killer instanceof Player player) {
             ItemStack main = player.getMainHandItem();
-            ItemStack off  = player.getOffhandItem();
+            ItemStack off = player.getOffhandItem();
 
             boolean hasEraser = !main.isEmpty() && main.getItem() == ModItems.ERASER_ITEM.get()
-                    || !off.isEmpty()  && off.getItem()  == ModItems.ERASER_ITEM.get();
+                    || !off.isEmpty() && off.getItem() == ModItems.ERASER_ITEM.get();
 
             boolean hasWorldDestroyer = !main.isEmpty() && main.getItem() == ModItems.WORLD_DESTROYER.get()
-                    || !off.isEmpty()  && off.getItem()  == ModItems.WORLD_DESTROYER.get();
+                    || !off.isEmpty() && off.getItem() == ModItems.WORLD_DESTROYER.get();
 
             if (hasEraser || hasWorldDestroyer) {
                 cir.setReturnValue(7);

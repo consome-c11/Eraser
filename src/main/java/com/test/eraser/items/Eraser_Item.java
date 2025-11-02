@@ -2,18 +2,17 @@ package com.test.eraser.items;
 
 import com.test.eraser.additional.ModTiers;
 import com.test.eraser.entity.HomingArrowEntity;
-import com.test.eraser.logic.ILivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.Level;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -25,9 +24,20 @@ public class Eraser_Item extends SwordItem {
         super(ModTiers.ERASER_TIER, 10, -2.4F, props.stacksTo(1).fireResistant());
     }
 
+    private static int waveGrayWhiteColor(long time, int index, double speed) {
+        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
+        int gray = 0xAAAAAA;
+        int white = 0xFFFFFF;
+        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
+        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
+        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
+
+        return (0xFF << 24) | (r << 16) | (g << 8) | b;
+    }
+
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        killIfParentFound(target, player,7,32);
+        killIfParentFound(target, player, 7, 32);
         return false;
     }
 
@@ -93,17 +103,5 @@ public class Eraser_Item extends SwordItem {
         }
         tooltip.add(1, waveLine);
         tooltip.add(2, waveLine2);
-    }
-
-
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 }

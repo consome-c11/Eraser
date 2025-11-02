@@ -58,14 +58,14 @@ public class Eraser_Utils {
         Optional<ILivingEntity> opt = findParentILiving(self, searchRadius);
         if (opt.isPresent()) {
             try {
-                if(attacker instanceof  Player player)
-                       opt.get().instantKill(player,moredrop);
+                if (attacker instanceof Player player)
+                    opt.get().instantKill(player, moredrop);
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-        if(self instanceof ILivingEntity living) living.instantKill((Player)attacker,moredrop);
+        if (self instanceof ILivingEntity living) living.instantKill((Player) attacker, moredrop);
         return false;
     }
 
