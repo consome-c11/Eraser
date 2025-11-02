@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+/*@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
@@ -31,8 +31,20 @@ public class Config {
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        instantKillItems = INSTANT_KILL_ITEMS.get().stream()
-                .map(name -> ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(name)))
+        if (event.getConfig() == null || event.getConfig().getSpec() != Config.CLIENT_SPEC) return;
+        var names = INSTANT_KILL_ITEMS.get();
+        if (names == null) return;
+
+        instantKillItems = names.stream()
+                .map(name -> {
+                    try {
+                        return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(name));
+                    } catch (Exception ex) {
+                        LOGGER.warn("Invalid item resource location in config: {}", name, ex);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
-}
+}*/
