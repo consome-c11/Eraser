@@ -5,6 +5,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
+import java.util.Set;
+import java.util.UUID;
+
 @Mixin(TransientEntitySectionManager.class)
 public interface TransientEntitySectionManagerAccessor<T extends EntityAccess> {
     @Accessor("sectionStorage")
@@ -16,4 +19,6 @@ public interface TransientEntitySectionManagerAccessor<T extends EntityAccess> {
     @Invoker("removeSectionIfEmpty")
     void invokeRemoveSectionIfEmpty(long sectionKey, EntitySection<T> section);
 
+    @Accessor("entityGetter")
+    LevelEntityGetter<T> getEntityGetter();
 }

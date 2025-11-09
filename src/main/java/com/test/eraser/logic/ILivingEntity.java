@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface ILivingEntity {
     boolean isErased();
@@ -21,5 +22,8 @@ public interface ILivingEntity {
 
     void setwasFullset(boolean fullset);
 
-    <T> boolean removeEntity(T target, Map<Class<?>, List<T>> storage);
+    void markErased(UUID uuid);
+
+    boolean isErased(UUID uuid);
+
 }

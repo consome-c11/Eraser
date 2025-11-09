@@ -1,9 +1,6 @@
 package com.test.eraser.network;
 
-import com.test.eraser.network.packets.EraserRangeAttackPacket;
-import com.test.eraser.network.packets.RayCastPacket;
-import com.test.eraser.network.packets.ShieldEffectPacket;
-import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
+import com.test.eraser.network.packets.*;
 import net.minecraftforge.network.NetworkDirection;
 
 import java.util.Optional;
@@ -41,6 +38,12 @@ public class ModPackets {
                 RayCastPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
-
+        PacketHandler.CHANNEL.registerMessage(
+                id++, EraseEntityPacket.class,
+                EraseEntityPacket::encode,
+                EraseEntityPacket::decode,
+                EraseEntityPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
     }
 }

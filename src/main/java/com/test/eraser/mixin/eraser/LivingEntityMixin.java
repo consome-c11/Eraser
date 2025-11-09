@@ -1,28 +1,33 @@
 package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.additional.ModDamageSources;
-import com.test.eraser.additional.ModDamageTypeTags;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.network.PacketHandler;
+import com.test.eraser.network.packets.EraseEntityPacket;
+import com.test.eraser.utils.EraseEntityLookupBridge;
 import com.test.eraser.utils.SynchedEntityDataUtil;
+import com.test.eraser.utils.TaskScheduler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.*;
-import net.minecraft.world.phys.AABB;
+import net.minecraftforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,10 +38,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mixin(value = LivingEntity.class, priority = 1000)
 public abstract class LivingEntityMixin implements ILivingEntity {
+
 
     @Unique
     private boolean erased = false;
@@ -63,23 +71,36 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         this.Fullset = Fullset;
     }
 
+    private static final Set<UUID> erasedUuids = ConcurrentHashMap.newKeySet();
+
+    @Override
+    public void markErased(UUID uuid) {
+        erasedUuids.add(uuid);
+    }
+
+    @Override
+    public boolean isErased(UUID uuid) {
+        return erasedUuids.contains(uuid);
+    }
+
     @Override
     public void instantKill(Player attacker) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (!self.isAlive()) return;
+
+        if (self.level().isClientSide || this.isErased()) return;
         this.setErased(true);
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
         SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
         ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
-        ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int) Instant.now().getEpochSecond());
+        ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int)Instant.now().getEpochSecond());
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
 
-
+        //if (Config.isNormalDieEntity(self)) {}
+        //else if (Config.FORCE_DIE.get()) {
         forcedie(eraseSrc);
-        if (!(self instanceof Player)) forceErase();
-
-
+        if (!(self instanceof ServerPlayer)/* && !self.isDeadOrDying()*/) TaskScheduler.schedule(this::forceErase, 19);
+        //}
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
         //Entity moved = self.changeDimension(dest);//for muteki star
@@ -87,18 +108,19 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     }
 
     private void forcedie(DamageSource source) {
-
         LivingEntity self = (LivingEntity) (Object) this;
-        if(!(self instanceof ServerPlayer))self.die(source);
+        //if(!(self instanceof ServerPlayer)) { self.die(source);}
         ((LivingEntityAccessor) self).setDeadFlag(true);
+        //self.deathTime = 1;
         if (!self.level().isClientSide) {
             if (self instanceof ServerPlayer sp) {
                 Component deathMsg = sp.getCombatTracker().getDeathMessage();
                 sp.connection.send(new ClientboundPlayerCombatKillPacket(sp.getId(), deathMsg));
-                if (((LivingEntityAccessor) self).isDeadFlag())
-                    sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
+                if (self.isDeadOrDying()) sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
             }
-            ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
+            //((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
+            ((LivingEntityAccessor)self).invokedropFromLootTable(source,false);
+            ((LivingEntityAccessor)self).invokedropExperience();
         }
         self.setPose(Pose.DYING);
     }
@@ -111,93 +133,106 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (!(self.level() instanceof ServerLevel serverLevel)) return;
-        try {
-            self.setRemoved(Entity.RemovalReason.KILLED);
+        markErased(self.getUUID());
+        self.setPosRaw(Double.NaN, Double.NaN, Double.NaN);
+        ((EntityAccessor)self).setRemovalReason(Entity.RemovalReason.KILLED);
+        self.setRemoved(Entity.RemovalReason.KILLED);
+        if (self.level() instanceof ServerLevel serverLevel) {
             self.stopRiding();
-            self.onRemovedFromWorld();
             self.invalidateCaps();
-            /*if (self instanceof Mob mob) {
-                mob.setNoAi(true);
-                mob.goalSelector.getAvailableGoals().clear();
-                mob.targetSelector.getAvailableGoals().clear();
-            }*/
-            ClientboundBossEventPacket pkt = ClientboundBossEventPacket.createRemovePacket(self.getUUID());
-            for (ServerPlayer sp : serverLevel.players()) {
-                sp.connection.send(pkt);
-            }
-
-            self.setBoundingBox(new AABB(0, 0, 0, 0, 0, 0));
+            self.setLevelCallback(EntityInLevelCallback.NULL);
             EntityTickList tickList = ((ServerLevelAccessor) serverLevel).getEntityTickList();
+            tickList.remove(self);
             Int2ObjectMap<Entity> active = ((EntityTickListAccessor) tickList).getActive();
             active.remove(self.getId());
-            ClientboundRemoveEntitiesPacket packet =
-                    new ClientboundRemoveEntitiesPacket(new int[]{self.getId()});
+
+            ClientboundRemoveEntitiesPacket removePkt = new ClientboundRemoveEntitiesPacket(new int[]{self.getId()});
+            ClientboundBossEventPacket bossRemovePkt = ClientboundBossEventPacket.createRemovePacket(self.getUUID());
             for (ServerPlayer sp : serverLevel.players()) {
-                sp.connection.send(packet);
+                sp.connection.send(removePkt);
+                sp.connection.send(bossRemovePkt);
+                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getId()));
             }
 
             PersistentEntitySectionManager<Entity> manager =
                     ((ServerLevelAccessor) serverLevel).getEntityManager();
-            EntitySectionStorage<Entity> storage =
-                    ((PersistentEntitySectionManagerAccessor) manager).getSectionStorage();
-            ((PersistentEntitySectionManagerAccessor<Entity>) manager)
-                    .getCallbacks()
-                    .onDestroyed(self);
+            PersistentEntitySectionManagerAccessor<Entity> acc =
+                    (PersistentEntitySectionManagerAccessor<Entity>) manager;
 
-            EntityLookup<Entity> lookup =
-                    ((PersistentEntitySectionManagerAccessor<Entity>) manager).getVisibleEntityStorage();
+            EntityLookup<Entity> vis = acc.getVisibleEntityStorage();
+            ((EraseEntityLookupBridge<Entity>) vis).eraseEntity(self);
 
-            Int2ObjectMap<Entity> byId = ((EntityLookupAccessor<Entity>) lookup).getById();
-            byId.remove(self.getId());
-            Map<UUID, Entity> byUuid = ((EntityLookupAccessor<Entity>) lookup).getByUuid();
-            byUuid.remove(self.getUUID());
+            LevelEntityGetter<Entity> getter = acc.getEntityGetter();
+            EntityLookup<Entity> vis2 = ((LevelEntityGetterAdapterAccessor<Entity>) getter).getVisibleEntities();
+            ((EraseEntityLookupBridge<Entity>) vis2).eraseEntity(self);
+            EntitySectionStorage<Entity> storage2 = ((LevelEntityGetterAdapterAccessor<Entity>) getter).getSectionStorage();
+            long sectionKey2 = SectionPos.asLong(self.blockPosition());
+            EntitySection<Entity> section2 = storage2.getSection(sectionKey2);
+            if (section2 != null) {
+                ClassInstanceMultiMap<Entity> multiMap =
+                        ((EntitySectionAccessor<Entity>) section2).getStorage();
+                multiMap.remove(self);
+            }
+            acc.getKnownUuids().remove(self.getUUID());
 
-            Object getter = ((PersistentEntitySectionManagerAccessor<?>) manager).getEntityGetter();
-            ((LevelEntityGetterAdapterAccessor<Entity>) getter).getVisibleEntities().remove(self);
-
-            LevelCallback<Entity> callbacks = (LevelCallback<Entity>) ((PersistentEntitySectionManagerAccessor<?>) manager).getCallbacks();
-            callbacks.onTrackingEnd(self);
-            ((PersistentEntitySectionManagerAccessor<Entity>) manager)
-                    .getKnownUuids()
-                    .remove(self.getUUID());
-
-            self.setLevelCallback(EntityInLevelCallback.NULL);
+            EntitySectionStorage<Entity> storage = acc.getSectionStorage();
             long sectionKey = SectionPos.asLong(self.blockPosition());
             EntitySection<Entity> section = storage.getSection(sectionKey);
             if (section != null) {
-                ((PersistentEntitySectionManagerAccessor<Entity>) manager).getSectionStorage().remove(sectionKey);
-                ClassInstanceMultiMap<Entity> multiMap =
-                        ((EntitySectionAccessor<Entity>) section).getStorage();
-                Map<Class<?>, List<Entity>> map =
-                        ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
+                ((EntitySectionAccessor)section).getStorage().remove(self);;
+                ClassInstanceMultiMap<Entity> multiMap = ((EntitySectionAccessor<Entity>) section).getStorage();
+                Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
+                hardRemove(self, byClass);
 
-                removeEntity(self, map);
             }
-            if (serverLevel.getEntity(self.getUUID()) != null) {
+            ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+            Int2ObjectMap<?> entityMap = ((ChunkMapAccessor) chunkMap).getEntityMap();
+            Object tracked = entityMap.remove(self.getId());
+            if (tracked instanceof TrackedEntityAccessor accessor) {
+                accessor.invokeBroadcastRemoved();
+            }
+            if (serverLevel.getEntity(self.getUUID()) != null && vis.getEntity(self.getUUID()) != null && vis2.getEntity(self.getUUID()) != null && acc.getKnownUuids().contains(self.getUUID()) && ((EntitySectionAccessor<?>) section2).getStorage().contains(self)) {
                 System.err.println("[EraserMod] failed to fully remove entity id=" + self.getId());
             }
-        } catch (Throwable t) {
-            System.err.print("[EraserMod] forceErase failed for entity id=" + self.getId() + "uuid=" + self.getUUID() + "class={}" + self.getClass().getName() + ":" + t.toString());
-            throw t;
-        }
-
-    }
-
-    @Override
-    public <T> boolean removeEntity(T target, Map<Class<?>, List<T>> storage) {
-        boolean removed = false;
-
-        for (Map.Entry<Class<?>, List<T>> entry : storage.entrySet()) {
-            Class<?> clazz = entry.getKey();
-            List<T> list = entry.getValue();
-
-            if (clazz.isInstance(target)) {
-                removed |= list.remove(target);
+            else {
+                System.out.println("[EraserMod] successfully removed entity id=" + self.getId());
             }
         }
 
-        return removed;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc != null && mc.player != null && mc.player.level() instanceof ClientLevel clientLevel) {
+            TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
+            TransientEntitySectionManagerAccessor tAcc = (TransientEntitySectionManagerAccessor) tManager;
+
+            long tSectionKey = SectionPos.asLong(self.blockPosition());
+            EntitySection<Entity> tSection = tAcc.getSectionStorage().getSection(tSectionKey);
+            if (tSection != null) {
+                hardRemove(self, ((ClassInstanceMultiMapAccessor<Entity>) ((EntitySectionAccessor<Entity>) tSection).getStorage()).getByClass());
+                tSection.remove(self);
+            }
+
+            EntityLookup<Entity> tVisible =
+                    ((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities();
+            ((EraseEntityLookupBridge<Entity>) tVisible).eraseEntity(self);
+
+            clientLevel.removeEntity(self.getId(), Entity.RemovalReason.KILLED);
+        }
+    }
+
+    private static void hardRemove(Entity self, Map<Class<?>, List<Entity>> byClass) {
+        Class<?> c = self.getClass();
+        List<Entity> list = byClass.get(c);
+        if (list != null) {
+            list.remove(self);
+            if (list.isEmpty()) byClass.remove(c);
+        }
+        for (Map.Entry<Class<?>, List<Entity>> e : byClass.entrySet()) {
+            List<Entity> l = e.getValue();
+            if (l != null && !l.isEmpty()) {
+                l.remove(self);
+                if (l.isEmpty()) byClass.remove(e.getKey());
+            }
+        }
     }
 
     @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
@@ -216,26 +251,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             cir.setReturnValue(0F);
         }
     }
-
-    /*@Redirect(
-            method = "tick",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraftforge/common/ForgeHooks;onLivingTick(Lnet/minecraft/world/entity/LivingEntity;)Z"
-            )
-    )
-    private boolean eraser$skipLivingTick(LivingEntity entity) {
-        if (entity instanceof IEraserEntity erased && (erased.isErased() || erased.getProcessedId() == entity.getId() || true)) {
-            entity.sendSystemMessage(Component.literal(
-                    "[EraserMod] Skipped LivingTickEvent for " + entity.getName().getString() + " ID: " + entity.getId()
-            ));
-            System.out.println("[EraserMod] Skipped LivingTickEvent for " + entity.getName().getString() + " ID: " + entity.getId());
-            entity.setHealth(0);
-            //return true;
-        }
-        return ForgeHooks.onLivingTick(entity);
-    }*/
-
 
     @Inject(method = "isAlive", at = @At("HEAD"), cancellable = true)
     private void eraser$isAlive(CallbackInfoReturnable<Boolean> cir) {
@@ -263,6 +278,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         if (this.isErased()) {
             //self.setBoundingBox(new AABB(self.getX(), self.getY(), self.getZ(), self.getX(), self.getY(), self.getZ()));
             //ci.cancel();
+        }
+    }
+
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    private void eraser$die(CallbackInfo ci) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (this.isErased()) {
+            ci.cancel();
         }
     }
 }

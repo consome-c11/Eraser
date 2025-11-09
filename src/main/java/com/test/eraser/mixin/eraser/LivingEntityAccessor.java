@@ -2,6 +2,7 @@ package com.test.eraser.mixin.eraser;
 
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,6 +36,10 @@ public interface LivingEntityAccessor {
 
     @Invoker("dropAllDeathLoot")
     void invokeDropAllDeathLoot(DamageSource source);
+    @Invoker("dropFromLootTable")
+    void invokedropFromLootTable(DamageSource source, boolean causedByPlayer);
+    @Invoker("dropExperience")
+    void invokedropExperience();
 
     @Accessor("dead")
     boolean isDeadFlag();
@@ -42,4 +47,6 @@ public interface LivingEntityAccessor {
     @Accessor("dead")
     void setDeadFlag(boolean dead);
 
+    @Invoker("die")
+    void callDie(DamageSource source);
 }

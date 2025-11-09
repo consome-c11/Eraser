@@ -2,20 +2,23 @@ package com.test.eraser.logic;
 
 import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModDamageTypes;
+import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.entity.HomingArrowEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class AttackHandler {
+public class ServerEvents {
     public static int targetEntityId = -1;
 
     /*public static void instantKill(Entity target, Player attacker) {
@@ -193,6 +196,24 @@ public class AttackHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
 
+    }
+
+    @SubscribeEvent
+    public void onLootingLevel(LootingLevelEvent event) {
+        if (event.getDamageSource().getEntity() instanceof Player player) {
+            ItemStack main = player.getMainHandItem();
+            ItemStack off = player.getOffhandItem();
+
+            boolean hasEraser = !main.isEmpty() && main.getItem() == ModItems.ERASER_ITEM.get()
+                    || !off.isEmpty() && off.getItem() == ModItems.ERASER_ITEM.get();
+
+            boolean hasWorldDestroyer = !main.isEmpty() && main.getItem() == ModItems.WORLD_DESTROYER.get()
+                    || !off.isEmpty() && off.getItem() == ModItems.WORLD_DESTROYER.get();
+
+            if (hasEraser || hasWorldDestroyer) {
+                event.setLootingLevel(7);
+            }
+        }
     }
 
 }

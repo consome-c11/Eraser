@@ -1,9 +1,11 @@
 package com.test.eraser.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
 import com.test.eraser.client.renderer.ShieldEffectRenderer;
+import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
@@ -20,6 +22,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -112,6 +115,14 @@ public class ClientEvents {
         }
     }
 
+    /*@SubscribeEvent
+    public static void onRenderLivingPre(RenderLivingEvent.Pre<LivingEntity, ?> event) {
+        LivingEntity entity = event.getEntity();
+        PoseStack stack = event.getPoseStack();
 
+        if (entity.deathTime > 0) {
+            stack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+        }
+    }*/
 }
 

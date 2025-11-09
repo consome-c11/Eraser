@@ -30,7 +30,7 @@ public class ForgeHooksMixin {
             //System.out.println("[EraserMod] ForgeHooks.onLivingTick skipped for " + entity.getName().getString());
             entity.setHealth(0);
             //AttackHandler.instantKill(entity);
-            cir.setReturnValue(false);
+            //cir.setReturnValue(false);
         }
     }
 
@@ -55,7 +55,7 @@ public class ForgeHooksMixin {
             remap = false
     )
     private static void onGetLootingLevel(Entity target, Entity killer, DamageSource cause, CallbackInfoReturnable<Integer> cir) {
-        if (killer instanceof Player player) {
+        if (killer instanceof Player player && !player.level().isClientSide) {
             ItemStack main = player.getMainHandItem();
             ItemStack off = player.getOffhandItem();
 

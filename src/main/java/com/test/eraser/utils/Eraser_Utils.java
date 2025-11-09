@@ -72,34 +72,4 @@ public class Eraser_Utils {
         return false;
     }
 
-    public static void forceRemoveTransient(TransientEntitySectionManager<Entity> manager, Entity entity) {
-        long sectionKey = SectionPos.asLong(entity.blockPosition());
-        EntitySectionStorage<Entity> storage =
-                ((TransientEntitySectionManagerAccessor<Entity>) manager).getSectionStorage();
-
-        EntitySection<Entity> section = storage.getSection(sectionKey);
-
-        if (section != null) {
-            section.remove(entity);
-
-            ((TransientEntitySectionManagerAccessor<Entity>) manager)
-                    .invokeRemoveSectionIfEmpty(sectionKey, section);
-        }
-
-        Visibility visibility = section != null ? section.getStatus() : Visibility.TRACKED;
-
-        LevelCallback<Entity> callbacks =
-                ((TransientEntitySectionManagerAccessor<Entity>) manager).getCallbacks();
-
-        if (visibility.isTicking() || entity.isAlwaysTicking()) {
-            callbacks.onTickingEnd(entity);
-        }
-        callbacks.onTrackingEnd(entity);
-        callbacks.onDestroyed(entity);
-
-        ((TransientEntitySectionManagerAccessor<Entity>) manager)
-                .getSectionStorage().remove(sectionKey);
-
-        entity.setLevelCallback(EntityInLevelCallback.NULL);
-    }
 }

@@ -20,7 +20,7 @@ public class ForgeEventFactoryMixin {
         if (player instanceof ILivingEntity erased && erased.isErased()) {
             player.setHealth(0);
             //AttackHandler.instantKill(player);
-            ci.cancel();
+            //ci.cancel();
         }
     }
 
@@ -32,7 +32,7 @@ public class ForgeEventFactoryMixin {
     )
     private static void eraser$cancelPostTick(Player player, CallbackInfo ci) {
         if (player instanceof ILivingEntity erased && erased.isErased()) {
-            ci.cancel();
+            //ci.cancel();
         }
     }
 }
