@@ -4,6 +4,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -15,6 +16,8 @@ public interface LivingEntityAccessor {
     static EntityDataAccessor<Float> getDataHealthId() {
         throw new AssertionError();
     }
+
+
 
     @Accessor("lastHurtByPlayer")
     Player getLastHurtByPlayer();

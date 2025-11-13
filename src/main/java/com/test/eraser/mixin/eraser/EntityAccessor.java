@@ -1,5 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityInLevelCallback;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,4 +20,9 @@ public interface EntityAccessor {
 
     @Accessor("levelCallback")
     void setlevelCallback(EntityInLevelCallback callback);
+
+    @Accessor("DATA_POSE")
+    static EntityDataAccessor<Float> getDataPoseId() {
+        throw new AssertionError();
+    }
 }

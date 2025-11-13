@@ -1,13 +1,18 @@
 package com.test.eraser.mixin.client;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.utils.TintingVertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -15,8 +20,10 @@ import net.minecraftforge.registries.RegistryObject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -76,18 +83,18 @@ public abstract class ItemRendererMixin {
         return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 
-    @Redirect(
+    @Inject(
             method = "render",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;getFoilBufferDirect(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
+                    target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;getFoilBufferDirect(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;",
+                    shift = At.Shift.AFTER
             )
     )
-    private VertexConsumer eraser$redirectFoilBufferDirect(MultiBufferSource buffer, RenderType type, boolean p1, boolean p2,
-                                                           ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
-                                                           PoseStack poseStack, MultiBufferSource buf, int light, int overlay, BakedModel model) {
-        VertexConsumer base = ItemRenderer.getFoilBufferDirect(buffer, type, p1, p2);
-
+    private void eraser$injectFoilBuffer(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
+                                         PoseStack poseStack, MultiBufferSource buffer,
+                                         int packedLight, int packedOverlay, BakedModel model,
+                                         CallbackInfo ci) {
         if (shouldAffect(stack, ctx)) {
             long time = System.currentTimeMillis();
             int argb = waveGrayWhiteColor(time, 0, 700.0);
@@ -95,11 +102,44 @@ public abstract class ItemRendererMixin {
             float g = ((argb >> 8) & 0xFF) / 255f;
             float b = (argb & 0xFF) / 255f;
             float a = ((argb >> 24) & 0xFF) / 255f;
-            return new TintingVertexConsumer(base, r, g, b, a);
+
         }
-        return base;
     }
 
+    /*@Inject(method = "render", at = @At("HEAD"))
+    private void eraser$injectDynamic(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
+                                      PoseStack poseStack, MultiBufferSource buffer,
+                                      int packedLight, int packedOverlay, BakedModel model,
+                                      CallbackInfo ci) {
+        if (shouldAffect(stack, ctx)) {
+            if(dynTex == null || dynLoc == null || img == null) {
+                initTexture();
+            }
+            long time = System.currentTimeMillis();
+            int color = waveGrayWhiteColor(time, 0, 700.0);
+            System.out.println("alpha=" + ((color >>> 24) & 0xFF));
+
+            img.fillRect(0, 0, img.getWidth(), img.getHeight(), color);
+            dynTex.upload();
+
+            RenderType dynType = RenderType.text(dynLoc);
+            VertexConsumer vc = buffer.getBuffer(dynType);
+            ((ItemRendererAccessor)(Object)this).callRenderModelLists(model, stack, packedLight, packedOverlay, poseStack, vc);
+        }
+    }*/
+
+    private static DynamicTexture dynTex = null;
+    private static ResourceLocation dynLoc = null;
+    private static NativeImage img = null;
+
+    private static void initTexture() {
+        if (dynTex == null) {
+            img = new NativeImage(16, 16, true); // 16x16 RGBA?
+            dynTex = new DynamicTexture(img);
+            dynLoc = Minecraft.getInstance().getTextureManager()
+                    .register("eraser:item_overlay", dynTex);
+        }
+    }
     @Inject(method = "render", at = @At("HEAD"))
     private void eraser$rotateInGui(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                     PoseStack poseStack, MultiBufferSource buffer, int packedLight,

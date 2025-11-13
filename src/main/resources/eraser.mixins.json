@@ -8,6 +8,7 @@
     "client.CreativeModeInventoryScreenMixin",
     "client.CreativeModeInventoryScreenAccess",
     "client.ItemRendererMixin",
+    "client.ItemRendererAccessor",
     "client.ItemStackDisplayMixin",
     "client.SetScreenMixin",
     "client.TransientEntitySectionManagerAccessor",
@@ -15,6 +16,7 @@
     "client.ClientLevelMixin",
     "client.LivingEntityMixin",
     "client.LevelMixin",
+    "client.BossHelthOverlayAccessor",
     "snackprotector.GameRendererMixin"
   ],
   "mixins": [
@@ -40,7 +42,13 @@
     "eraser.ServerLevelEntityCallbacksMixin",
     "eraser.EntityAccessor",
     "eraser.ChunkSerializerMixin",
-    "snackprotector.LivingEntityMixin"
+    "snackprotector.LivingEntityMixin",
+    "world_destroyer.ServerLevelMixin",
+    "world_destroyer.ServerLevelAccessor",
+    "world_destroyer.LevelChunkMixin",
+    "world_destroyer.LevelChunkAccessor",
+    "world_destroyer.LevelChunkSectionAccessor",
+    "world_destroyer.LevelChunkSectionMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

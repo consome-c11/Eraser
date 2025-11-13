@@ -1,5 +1,7 @@
 package com.test.eraser.logic;
 
+import com.test.eraser.mixin.world_destroyer.ServerLevelAccessor;
+import com.test.eraser.mixin.world_destroyer.ServerLevelMixin;
 import com.test.eraser.utils.DestroyMode;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
@@ -65,7 +67,7 @@ public class DestroyBlock {
             }
         }
 
-        level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+        ((IServerLevel)level).forceSetBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL, true);
 
         for (ItemStack drop : drops) {
             ItemEntity entity = new ItemEntity(level,

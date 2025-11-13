@@ -6,12 +6,15 @@ import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
 import com.test.eraser.client.renderer.ShieldEffectRenderer;
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.mixin.client.BossHelthOverlayAccessor;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import com.test.eraser.utils.DestroyMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,6 +29,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
@@ -43,6 +47,7 @@ public class ClientEvents {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
+
         if (mc == null || mc.player == null || mc.level == null) return;
         erase();
         ItemStack stack = mc.player.getMainHandItem();
@@ -100,16 +105,15 @@ public class ClientEvents {
         if (event.getButton() == 1 && event.getAction() == 1 && mc.player.isShiftKeyDown() && stack.getItem() == ModItems.ERASER_ITEM.get()) {
             PacketHandler.CHANNEL.sendToServer(new EraserRangeAttackPacket());
         }
-        if (event.getButton() == 0 && event.getAction() == 0 && stack.getItem() == ModItems.ERASER_ITEM.get()) {
-            HitResult hit = mc.player.pick(64.0D, 0.0F, false);
-            if (hit.getType() == HitResult.Type.ENTITY) {
+        if (event.getButton() == 0 && stack.getItem() == ModItems.ERASER_ITEM.get()) {
+
+            HitResult hit = mc.hitResult;
+            if (hit != null && hit.getType() == HitResult.Type.ENTITY) {
                 EntityHitResult entityHit = (EntityHitResult) hit;
                 int id = entityHit.getEntity().getId();
-
                 PacketHandler.CHANNEL.sendToServer(new RayCastPacket(id));
             }
         }
-
     }
 
     /*@SubscribeEvent //shitty shield effect rendering
@@ -131,7 +135,7 @@ public class ClientEvents {
         LivingEntity entity = event.getEntity();
         UUID uuid = entity.getUUID();
 
-        if (entity instanceof ILivingEntity living && living.isErased(uuid)) {
+        if (entity instanceof ILivingEntity living && living.isErased()) {
             long now = System.currentTimeMillis();
             long last = lastUpdate.getOrDefault(uuid, 0L);
 

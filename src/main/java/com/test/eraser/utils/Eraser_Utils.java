@@ -33,11 +33,6 @@ public class Eraser_Utils {
         return Optional.empty();
     }
 
-    public static Optional<LivingEntity> findParentLiving(Entity self, double searchRadius) {
-        Optional<Entity> parent = findParentEntity(self, searchRadius);
-        return parent.filter(p -> p instanceof LivingEntity).map(p -> (LivingEntity) p);
-    }
-
     @SuppressWarnings("unchecked")
     public static Optional<ILivingEntity> findParentILiving(Entity self, double searchRadius) {
         Optional<Entity> parent = findParentEntity(self, searchRadius);
@@ -49,7 +44,7 @@ public class Eraser_Utils {
         return Optional.empty();
     }
 
-    public static boolean killIfParentFound(Entity self, Entity attacker, int moredrop, double searchRadius) {
+    public static boolean killIfParentFound(Entity self, Entity attacker, double searchRadius) {
         Optional<ILivingEntity> opt = findParentILiving(self, searchRadius);
         if (opt.isPresent()) {
             try {
@@ -60,7 +55,7 @@ public class Eraser_Utils {
                 ex.printStackTrace();
             }
         }
-        if (self instanceof ILivingEntity living) living.instantKill((Player) attacker);
+        if (self instanceof ILivingEntity living && attacker instanceof Player player) living.instantKill(player);
         return false;
     }
 

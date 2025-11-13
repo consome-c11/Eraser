@@ -24,13 +24,8 @@ public class ForgeHooksMixin {
     )
     private static void eraser$cancelLivingTick(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {
         if (entity instanceof ILivingEntity erased && (erased.isErased())) {
-            /*entity.sendSystemMessage(Component.literal(
-                    "[EraserMod] Skipped LivingTickEvent for " + entity.getName().getString() + " ID: " + entity.getId()
-            ));*/
-            //System.out.println("[EraserMod] ForgeHooks.onLivingTick skipped for " + entity.getName().getString());
-            entity.setHealth(0);
-            //AttackHandler.instantKill(entity);
-            //cir.setReturnValue(false);
+            cir.setReturnValue(false);
+            cir.cancel();
         }
     }
 
@@ -45,8 +40,10 @@ public class ForgeHooksMixin {
             //System.out.println("[EraserMod] Skipped LivingDeathEvent for " + entity.getName().getString());
             entity.setHealth(0);
             cir.setReturnValue(false);
+            cir.cancel();
         }
     }
+
 
     @Inject(
             method = "getLootingLevel(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/damagesource/DamageSource;)I",
@@ -71,6 +68,21 @@ public class ForgeHooksMixin {
         }
     }
 
+    @Inject(
+            method = "onLivingAttack",
+            at = @At("HEAD"),
+            cancellable = true,
+            remap = false
+    )
+    private static void eraser$cancelLivingAttack(LivingEntity entity, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (source.getEntity() instanceof Player attacker) {
+            if(attacker.getMainHandItem().getItem() == ModItems.ERASER_ITEM.get() || attacker.getMainHandItem().getItem() == ModItems.WORLD_DESTROYER.get()) {
+                cir.setReturnValue(false);
+                cir.cancel();
+                attacker.hurt(attacker.damageSources().genericKill(), 1.0F);
+            }
+        }
+    }
 
     /*@Inject(
             method = "onPlayerPreTick",

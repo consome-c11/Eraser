@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Mixin(value = LivingEntity.class, priority = 1000)
+@Mixin(value = LivingEntity.class)
 public abstract class LivingEntityMixin implements ILivingEntity {
 
 
@@ -88,8 +88,9 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void instantKill(Player attacker) {
         LivingEntity self = (LivingEntity) (Object) this;
-
-        if (this.isErased()) return;
+        self.setPose(Pose.DYING);
+        SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
+        if (this.isErased() || self.level().isClientSide) return;
         markErased(self.getUUID());
 
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
@@ -99,12 +100,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
         ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
+        if(self.level().isClientSide()) return;
         this.setErased(true);
         if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
         else if (Config.FORCE_DIE.get()) {
             forcedie(eraseSrc);
             if (!(self instanceof ServerPlayer))
-                TaskScheduler.schedule(this::forceErase, 19);
+                TaskScheduler.schedule(this::forceErase, 21);
         }
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
@@ -117,6 +119,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //if(!(self instanceof ServerPlayer)) { self.die(source);}
         ((LivingEntityAccessor) self).setDeadFlag(true);
         //self.deathTime = 1;
+
         if (!self.level().isClientSide) {
 
             if (self instanceof ServerPlayer sp) {
@@ -133,7 +136,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             ((LivingEntityAccessor)self).invokedropFromLootTable(source,false);
             ((LivingEntityAccessor)self).invokedropExperience();
         }
-        self.setPose(Pose.DYING);
     }
 
     @Override
@@ -203,7 +205,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             if (self instanceof TrackedEntityAccessor accessor) {
                 accessor.invokeBroadcastRemoved();
             }
-            self.remove(Entity.RemovalReason.KILLED);
             ((EntityAccessor)self).setRemovalReason(Entity.RemovalReason.KILLED);
             if(debug) {
                 UUID originalUuid = self.getUUID();
@@ -277,7 +278,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getHealth", at = @At("RETURN"), cancellable = true)
     private void overrideGetHealth(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (this.isErased()) {
@@ -285,7 +286,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "getMaxHealth", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getMaxHealth", at = @At("RETURN"), cancellable = true)
     private void overridegetMaxHealth(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
 
@@ -294,7 +295,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "isAlive", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isAlive", at = @At("RETURN"), cancellable = true)
     private void eraser$isAlive(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (self instanceof Player player && SnackArmor.SnackProtector.isFullSet(player)) {
@@ -306,7 +307,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "isDeadOrDying", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isDeadOrDying", at = @At("RETURN"), cancellable = true)
     private void eraser$isDeadOrDying(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (self instanceof Player player && SnackArmor.SnackProtector.isFullSet(player)) {
@@ -327,7 +328,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "die", at = @At("HEAD"), cancellable = true)//wtf?????????????????????????
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     private void eraser$die(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (this.isErased()) {
