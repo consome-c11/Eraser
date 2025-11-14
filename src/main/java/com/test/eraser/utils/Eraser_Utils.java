@@ -6,13 +6,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.entity.PartEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
 public class Eraser_Utils {
-    public static Optional<Entity> findParentEntity(Entity self, double searchRadius) {
-        if (self == null || self.level() == null) return Optional.empty();
+    public static Entity findParentEntity(Entity self, double searchRadius) {
+        if (self == null || self.level() == null) return null;
 
         AABB box = self.getBoundingBox().inflate(searchRadius);
         List<Entity> nearby = self.level().getEntities(self, box);
@@ -24,39 +25,28 @@ public class Eraser_Utils {
             if (parts != null) {
                 for (PartEntity<?> part : parts) {
                     if (part == self) {
-                        return Optional.of(e);
+                        return e;
                     }
                 }
             }
         }
 
-        return Optional.empty();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Optional<ILivingEntity> findParentILiving(Entity self, double searchRadius) {
-        Optional<Entity> parent = findParentEntity(self, searchRadius);
-        if (parent.isEmpty()) return Optional.empty();
-        Entity p = parent.get();
-        if (p instanceof ILivingEntity) {
-            return Optional.of((ILivingEntity) p);
-        }
-        return Optional.empty();
+        return null;
     }
 
     public static boolean killIfParentFound(Entity self, Entity attacker, double searchRadius) {
-        Optional<ILivingEntity> opt = findParentILiving(self, searchRadius);
-        if (opt.isPresent()) {
-            try {
-                if (attacker instanceof Player player)
-                    opt.get().instantKill(player);
+        if (findParentEntity(self, searchRadius) instanceof ILivingEntity entity) {
+
+            if (attacker instanceof Player player) {
+                entity.instantKill(player);
                 return true;
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         }
-        if (self instanceof ILivingEntity living && attacker instanceof Player player) living.instantKill(player);
+        if(self instanceof ILivingEntity entity && attacker instanceof Player player)
+            entity.instantKill(player);
+
         return false;
     }
 
 }
+

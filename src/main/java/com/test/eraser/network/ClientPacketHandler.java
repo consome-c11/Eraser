@@ -37,7 +37,6 @@ public class ClientPacketHandler {
                 erased.setErased(true);
                 BossHealthOverlay overlay = mc.gui.getBossOverlay();
                 overlay.update(ClientboundBossEventPacket.createRemovePacket(e.getUUID()));
-
                 erased.eraseClientEntity();
                 erased.markErased(e.getUUID());
             }

@@ -135,7 +135,7 @@ public class ClientEvents {
         if (event.getButton() == 1 && event.getAction() == 1 && mc.player.isShiftKeyDown() && stack.getItem() == ModItems.ERASER_ITEM.get()) {
             PacketHandler.CHANNEL.sendToServer(new EraserRangeAttackPacket());
         }
-        if (event.getButton() == 0 && stack.getItem() == ModItems.ERASER_ITEM.get()) {
+        if (event.getButton() == 0 && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
 
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.ENTITY) {

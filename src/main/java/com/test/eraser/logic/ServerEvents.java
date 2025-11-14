@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
@@ -18,6 +19,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.level.ChunkDataEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,7 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents {
-    public static int targetEntityId = -1;
+    //public static int targetEntityId = -1;
 
     /*public static void instantKill(Entity target, Player attacker) {
         if (target == null || target.level().isClientSide() || !target.isAlive()) return;
@@ -184,7 +186,7 @@ public class ServerEvents {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+    /*@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onLivingAttack(LivingAttackEvent event) {
         Entity attacker = event.getSource().getEntity();
 
@@ -197,7 +199,7 @@ public class ServerEvents {
             if (!HasEraser) return;
             //instantKill(event.getEntity(), player);
         }
-    }
+    }*/
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
@@ -230,6 +232,16 @@ public class ServerEvents {
         }
     }
 
+    @SubscribeEvent
+    public void onAttackEntity(LivingAttackEvent event) {
+        Entity player = event.getSource().getEntity();
+        if(player instanceof LivingEntity player_) {
+            ItemStack stack = player_.getMainHandItem();
+            if (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
+                event.setCanceled(true);
+            }
+        }
+    }
 }
 
 

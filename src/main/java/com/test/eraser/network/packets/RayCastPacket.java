@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -39,10 +40,10 @@ public class RayCastPacket {
             if (sender != null) {
                 Entity target = sender.level().getEntity(msg.entityId);
                 if(sender.level().isClientSide()) return;
-                if (target != null) {
+                if (target != null && sender.getPosition(0).distanceTo(target.getPosition(0)) <= 4) {
                     Minecraft mc = Minecraft.getInstance();
                     ((BossHelthOverlayAccessor)mc.gui.getBossOverlay()).getEvents().remove(target.getUUID());
-                    Eraser_Utils.killIfParentFound(target, sender, 32);
+                    Eraser_Utils.killIfParentFound(target, (Player)sender, 32);
 
                     System.out.println("RayCastPacket: processed entity ID " + msg.entityId);
                 }

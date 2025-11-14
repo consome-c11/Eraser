@@ -25,7 +25,7 @@ public class WorldDestroyerUtils {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
         ItemStack held = player.getMainHandItem();
-        if (!held.is(ModItems.WORLD_DESTROYER.get())) return;
+        if (!held.is(ModItems.WORLD_DESTROYER.get()) && !held.is(ModItems.ERASER_ITEM.get())) return;
 
         var pos = event.getPos();
         var level = (ServerLevel) event.getLevel();
@@ -34,37 +34,44 @@ public class WorldDestroyerUtils {
 
         int fortuneLevel = 7;
         boolean silk = DestroyMode.isSilkTouchEnabled(held);
+        if(held.is(ModItems.WORLD_DESTROYER.get())) {
+            switch (mode) {
+                case SAME_ID -> {
+                    var originBlockId = level.getBlockState(pos).getBlock()
+                            .builtInRegistryHolder().key().location();
 
-        switch (mode) {
-            case SAME_ID -> {
-                var originBlockId = level.getBlockState(pos).getBlock()
-                        .builtInRegistryHolder().key().location();
-
-                if (silk) {
-                    DestroyBlock.breakSameIdByIdSilk(level, player, pos, held, originBlockId);
-                } else if (fortuneLevel > 0) {
-                    DestroyBlock.breakSameIdByIdFortune(level, player, pos, held, fortuneLevel, originBlockId);
-                } else {
-                    DestroyBlock.breakSameIdByIdNormal(level, player, pos, held, originBlockId);
+                    if (silk) {
+                        DestroyBlock.breakSameIdByIdSilk(level, player, pos, held, originBlockId);
+                    } else if (fortuneLevel > 0) {
+                        DestroyBlock.breakSameIdByIdFortune(level, player, pos, held, fortuneLevel, originBlockId);
+                    } else {
+                        DestroyBlock.breakSameIdByIdNormal(level, player, pos, held, originBlockId);
+                    }
                 }
-            }
-            case SAME_ID_ORE -> {
-                TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
-                Predicate<BlockState> oreOrLogPredicate = state ->
-                        state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
+                case SAME_ID_ORE -> {
+                    TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
+                    Predicate<BlockState> oreOrLogPredicate = state ->
+                            state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
 
-                //Predicate<BlockState> orePredicate = state -> state.is(FORGE_ORES);
-                if (silk) {
-                    DestroyBlock.breakSameId(level, player, pos, held, 0, true, 32, oreOrLogPredicate);
-                    DestroyBlock.breakBlockSilk(level, player, pos, held);
-                } else {
-                    DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 32, oreOrLogPredicate);
-                    DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
+                    //Predicate<BlockState> orePredicate = state -> state.is(FORGE_ORES);
+                    if (silk) {
+                        DestroyBlock.breakSameId(level, player, pos, held, 0, true, 32, oreOrLogPredicate);
+                        DestroyBlock.breakBlockSilk(level, player, pos, held);
+                    } else {
+                        DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 32, oreOrLogPredicate);
+                        DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
+                    }
                 }
+                default -> DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
             }
-            default -> DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
         }
-
+        else{
+            TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
+            Predicate<BlockState> LogPredicate = state ->
+                    state.is(BlockTags.LOGS);
+            DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 16, LogPredicate);
+            DestroyBlock.breakAreaWithFortune(level, player, pos, DestroyMode.NORMAL, held, fortuneLevel);
+        }
         event.setCanceled(true);
     }
 }

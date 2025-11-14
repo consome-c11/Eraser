@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
@@ -37,8 +38,13 @@ public class Eraser_Item extends SwordItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        ///*if(!player.level().isClientSide())*/killIfParentFound(target, player, 7, 32);
+        /*if(!player.level().isClientSide())*/killIfParentFound(target, player, 32);
         target.kill();
+        return false;
+    }
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         return false;
     }
 
@@ -60,10 +66,10 @@ public class Eraser_Item extends SwordItem {
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
-    @Override
+    /*@Override
     public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
         return false;
-    }
+    }*/
 
     public Component getName(ItemStack stack) {
         String text = "Eraser.";

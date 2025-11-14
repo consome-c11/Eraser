@@ -68,7 +68,7 @@ public class ForgeHooksMixin {
         }
     }
 
-    @Inject(
+    /*@Inject(
             method = "onLivingAttack",
             at = @At("HEAD"),
             cancellable = true,
@@ -82,7 +82,7 @@ public class ForgeHooksMixin {
                 attacker.hurt(attacker.damageSources().genericKill(), 1.0F);
             }
         }
-    }
+    }*/
 
     /*@Inject(
             method = "onPlayerPreTick",

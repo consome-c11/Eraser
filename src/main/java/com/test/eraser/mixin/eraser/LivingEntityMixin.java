@@ -103,12 +103,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         if(self.level().isClientSide()) return;
         this.setErased(true);
-        if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
-        else if (Config.FORCE_DIE.get()) {
+        /*if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
+        else if (Config.FORCE_DIE.get()) {*/
             forcedie(eraseSrc);
             if (!(self instanceof ServerPlayer))
                 TaskScheduler.schedule(this::forceErase, 21);
-        }
+        //}
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
         //Entity moved = self.changeDimension(dest);//for muteki star
@@ -147,6 +147,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;
+        self.level().broadcastEntityEvent(self, (byte)60);
         ((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
         if (self.level() instanceof ServerLevel serverLevel) {
             boolean debug = false;
@@ -330,6 +331,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         LivingEntity self = (LivingEntity) (Object) this;
         if (this.isErased()) {
             //ci.cancel();
+        }
+    }
+
+    @Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true)
+    private void eraser$tickDeath(CallbackInfo ci) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (this.isErased()) {
+            ci.cancel();
         }
     }
 }
