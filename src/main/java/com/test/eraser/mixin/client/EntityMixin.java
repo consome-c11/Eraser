@@ -22,22 +22,19 @@ public class EntityMixin {
     @Inject(method = "isCurrentlyGlowing", at = @At("HEAD"), cancellable = true)
     private void onIsCurrentlyGlowing(CallbackInfoReturnable<Boolean> cir) {
         Entity entity = (Entity) (Object) this;
-        if(!(entity instanceof LivingEntity)) return;
+        if (!(entity instanceof LivingEntity)) return;
+
         Player localPlayer = Minecraft.getInstance().player;
-        if (localPlayer != null) {
+        if (localPlayer == null) return;
 
-            if (localPlayer.isShiftKeyDown() && localPlayer.getMainHandItem().getItem() == ModItems.ERASER_ITEM.get() && entity != localPlayer) {
-                double radius = 10.0;
-                AABB area = localPlayer.getBoundingBox().inflate(radius);
+        if (localPlayer.isShiftKeyDown() && localPlayer.getMainHandItem().getItem() == ModItems.ERASER_ITEM.get() && entity != localPlayer) {
+            double radius = 10.0;
+            AABB inflatedPlayerAABB = localPlayer.getBoundingBox().inflate(radius);
 
-                Vec3 entityCenterPos = entity.getEyePosition();
+            AABB entityAABB = entity.getBoundingBox();
 
-                if (area.contains(entityCenterPos)) {
-                    if (entity instanceof LivingEntity && entity != localPlayer) {
-                        cir.setReturnValue(true);
-                    }
-
-                }
+            if (inflatedPlayerAABB.intersects(entityAABB)) {
+                cir.setReturnValue(true);
             }
         }
     }
