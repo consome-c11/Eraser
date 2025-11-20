@@ -96,19 +96,26 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         self.setPose(Pose.DYING);
         //SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
         if (this.isErased() || self.level().isClientSide) return;
-
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
-        EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
-        //self.hurt(eraseSrc,Float.MAX_VALUE);
-        SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
-        ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
-        ((LivingEntityAccessor) self).setLastHurtByMob(attacker);
-        ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
-        self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
-        if(self.level().isClientSide()) return;
 
-        if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
+        if (Config.isNormalDieEntity(self)) {
+
+            self.setHealth(0);
+            ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
+            ((LivingEntityAccessor) self).setLastHurtByMob(attacker);
+            ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
+            self.getCombatTracker().recordDamage(eraseSrc, 0);
+            ((LivingEntityAccessor) self).callDie(eraseSrc);
+            return;
+        }
         else if (Config.FORCE_DIE.get()) {
+            EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
+            //self.hurt(eraseSrc,Float.MAX_VALUE);
+            SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
+            ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
+            ((LivingEntityAccessor) self).setLastHurtByMob(attacker);
+            ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
+            self.getCombatTracker().recordDamage(eraseSrc, 0);
             markErased(self.getUUID());
             for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
                 PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID(), SkipAnimation || Config.SKIP_DEATH_ANIMATION.get()));
