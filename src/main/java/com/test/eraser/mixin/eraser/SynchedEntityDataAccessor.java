@@ -3,6 +3,7 @@ package com.test.eraser.mixin.eraser;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
+import org.checkerframework.checker.units.qual.A;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -17,4 +18,5 @@ public interface SynchedEntityDataAccessor {
 
     @Accessor("isDirty")
     void setDirtyFlag(boolean dirty);
+
 }

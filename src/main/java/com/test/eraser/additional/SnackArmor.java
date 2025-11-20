@@ -8,6 +8,7 @@ import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -112,12 +113,16 @@ public class SnackArmor {
         @SubscribeEvent
         public static void onEquipmentChange(LivingEquipmentChangeEvent event) {
             if (!(event.getEntity() instanceof Player player)) return;
+            if (player instanceof ILivingEntity Iliving) if (Iliving.wasFullset()) resetAbilities(player);
 
-            if (isFullSet(player)) {
-                applyAbilities(player);
-            } else if (player instanceof ILivingEntity Iliving) {
-                if (Iliving.wasFullset()) resetAbilities(player);
-            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+            if (!(event.getEntity() instanceof Player player)) return;
+
+            if (isFullSet(player)) applyAbilities(player);
+
         }
 
         @SubscribeEvent

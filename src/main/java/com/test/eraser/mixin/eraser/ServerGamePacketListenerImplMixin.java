@@ -16,7 +16,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     private void onSend(Packet<?> packet, CallbackInfo ci) {
         if (packet instanceof ClientboundAddEntityPacket add) {
             if (add instanceof ILivingEntity erase && erase.isErased()) {
-                ci.cancel();
+                //ci.cancel();
             }
         }
 

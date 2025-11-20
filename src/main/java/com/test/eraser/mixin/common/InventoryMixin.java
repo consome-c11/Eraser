@@ -35,7 +35,7 @@ public class InventoryMixin {
     private void onDropAll(CallbackInfo callbackInfo) {
         if (hasSpecialItemInInventory()) {
             if (player.isDeadOrDying() || ((ILivingEntity) player).isErased()) {
-                dropAll();
+                Chenged_dropAll();
                 callbackInfo.cancel();
             }
         }
@@ -56,7 +56,7 @@ public class InventoryMixin {
         return false;
     }
 
-    private void dropAll() {
+    private void Chenged_dropAll() {
         List<NonNullList<ItemStack>> compartments = getCompartments();
         if (compartments == null) return;
 
