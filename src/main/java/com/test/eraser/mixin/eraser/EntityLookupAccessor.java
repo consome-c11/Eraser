@@ -17,13 +17,19 @@ public interface EntityLookupAccessor<T extends EntityAccess> {
     @Accessor("byId")
     Int2ObjectMap<T> getById();
 
+    @Shadow
+    @Mutable
+    @Final
+    @Accessor("byId")
+    void setById(Int2ObjectMap<T> map);
+
     @Accessor("byUuid")
     Map<UUID, T> getByUuid();
 
-    @Shadow @Mutable @Final @Accessor("byUuid")
+    @Shadow
+    @Mutable
+    @Final
+    @Accessor("byUuid")
     void setByUuid(Map<UUID, T> map);
-
-    @Shadow @Mutable @Final @Accessor("byId")
-    void setById(Int2ObjectMap<T> map);
 
 }

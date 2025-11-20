@@ -20,7 +20,7 @@ public abstract class BlockStateBaseMixin {
     )
     private void ongetDestroyProgress(Player player, BlockGetter Level, BlockPos Pos, CallbackInfoReturnable<Float> cir) {
         if (Level instanceof Level level && player.isShiftKeyDown()) {
-            if(!level.getBlockState(Pos).isAir()) cir.setReturnValue(0.0f);
+            if (!level.getBlockState(Pos).isAir()) cir.setReturnValue(0.0f);
         }
 
     }

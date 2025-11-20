@@ -40,14 +40,14 @@ public class WorldDestroyerChangeModePacket {
                 DestroyMode.setMode(held, msg.mode);
                 DestroyMode.setSilkTouch(held, msg.silkEnabled);
 
-                if(Config.CHENGEMODE_MESSAGE.get())
+                if (Config.CHENGEMODE_MESSAGE.get())
                     player.displayClientMessage(
-                        Component.literal(
-                                "Mode: " + msg.mode.name() +
-                                        (msg.silkEnabled ? " [Silk ON]" : " [Silk OFF]")
-                        ),
-                        true
-                );
+                            Component.literal(
+                                    "Mode: " + msg.mode.name() +
+                                            (msg.silkEnabled ? " [Silk ON]" : " [Silk OFF]")
+                            ),
+                            true
+                    );
             }
         });
         ctx.get().setPacketHandled(true);

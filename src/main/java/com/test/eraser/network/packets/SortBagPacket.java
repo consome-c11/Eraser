@@ -1,12 +1,10 @@
 package com.test.eraser.network.packets;
 
-import com.test.eraser.gui.BagMenu;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.utils.BagItemEntry;
 import com.test.eraser.utils.BagSavedData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
@@ -15,14 +13,8 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class SortBagPacket {
-    public enum SortType {
-        NAME,
-        COUNT,
-    }
-
     private final UUID bagId;
     private final SortType sortType;
-
     public SortBagPacket(UUID bagId, SortType sortType) {
         this.bagId = bagId;
         this.sortType = sortType;
@@ -48,7 +40,7 @@ public class SortBagPacket {
 
                 List<BagItemEntry> nonEmptyEntries = new ArrayList<>();
                 for (BagItemEntry entry : allEntries) {
-                    if (entry.getCount() > 0 && entry.getItem() != net.minecraft.world.item.Items.AIR) {
+                    if (entry.count() > 0 && entry.item() != net.minecraft.world.item.Items.AIR) {
                         nonEmptyEntries.add(entry);
                     }
                 }
@@ -64,9 +56,9 @@ public class SortBagPacket {
                     }
 
                     if (existingEntry != null) {
-                        long newCount = existingEntry.getCount() + entryToCheck.getCount();
+                        long newCount = existingEntry.count() + entryToCheck.count();
                         consolidatedMap.remove(existingEntry);
-                        BagItemEntry newEntry = new BagItemEntry(existingEntry.getItem(), newCount, existingEntry.getTag());
+                        BagItemEntry newEntry = new BagItemEntry(existingEntry.item(), newCount, existingEntry.tag());
                         consolidatedMap.put(newEntry, newEntry);
                     } else {
                         consolidatedMap.put(entryToCheck, entryToCheck);
@@ -76,10 +68,10 @@ public class SortBagPacket {
 
                 switch (pkt.sortType) {
                     case NAME:
-                        finalConsolidated.sort(Comparator.comparing(entry -> entry.getItem().getDescription().getString().toLowerCase()));
+                        finalConsolidated.sort(Comparator.comparing(entry -> entry.item().getDescription().getString().toLowerCase()));
                         break;
                     case COUNT:
-                        finalConsolidated.sort((a, b) -> Long.compare(b.getCount(), a.getCount())); // count は long
+                        finalConsolidated.sort((a, b) -> Long.compare(b.count(), a.count())); // count は long
                         break;
                     default:
                         return;
@@ -99,9 +91,9 @@ public class SortBagPacket {
                     BagItemEntry oldEntry = i < oldAllEntries.size() ? oldAllEntries.get(i) : new BagItemEntry(net.minecraft.world.item.Items.AIR, 0, null);
                     BagItemEntry newEntry = i < allEntries.size() ? allEntries.get(i) : new BagItemEntry(net.minecraft.world.item.Items.AIR, 0, null);
 
-                    if (!Objects.equals(oldEntry.getItem(), newEntry.getItem()) ||
-                            oldEntry.getCount() != newEntry.getCount() ||
-                            !Objects.equals(oldEntry.getTag(), newEntry.getTag())) {
+                    if (!Objects.equals(oldEntry.item(), newEntry.item()) ||
+                            oldEntry.count() != newEntry.count() ||
+                            !Objects.equals(oldEntry.tag(), newEntry.tag())) {
                         int pageIndex = i / pageSize;
                         affectedPages.add(pageIndex);
                     }
@@ -124,6 +116,11 @@ public class SortBagPacket {
     }
 
     private static boolean areEntriesStackable(BagItemEntry a, BagItemEntry b) {
-        return a.getItem() == b.getItem() && Objects.equals(a.getTag(), b.getTag());
+        return a.item() == b.item() && Objects.equals(a.tag(), b.tag());
+    }
+
+    public enum SortType {
+        NAME,
+        COUNT,
     }
 }

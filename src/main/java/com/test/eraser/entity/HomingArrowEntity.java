@@ -129,8 +129,7 @@ public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!m
         if (!target.isAlive()) return false;
         double maxDistSq = SEARCH_RADIUS * SEARCH_RADIUS;
         if (this.position().distanceToSqr(target.position()) > maxDistSq) return false;
-        if (!hasLineOfSight(owner, target)) return false;
-        return true;
+        return hasLineOfSight(owner, target);
     }
 
     private void applyHomingTowards(LivingEntity target) {
@@ -211,7 +210,8 @@ public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!m
                         || off.getItem() instanceof com.test.eraser.Items.Eraser_Item;
         if (!shooterHasEraser) return;*/
 
-        if (hit instanceof LivingEntity living) if (living instanceof ILivingEntity hit_) hit_.instantKill((Player)this.getOwner(), false);
+        if (hit instanceof LivingEntity living)
+            if (living instanceof ILivingEntity hit_) hit_.instantKill((Player) this.getOwner(), false);
         this.remove(RemovalReason.KILLED);
     }
 

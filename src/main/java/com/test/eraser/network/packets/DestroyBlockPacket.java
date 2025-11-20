@@ -1,25 +1,16 @@
 package com.test.eraser.network.packets;
 
-import com.test.eraser.items.Eraser_Item;
-import com.test.eraser.logic.DestroyBlock;
 import com.test.eraser.utils.DestroyMode;
 import com.test.eraser.utils.WorldDestroyerUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class  DestroyBlockPacket {
+public class DestroyBlockPacket {
     private final BlockPos pos;
     private final DestroyMode mode;
 

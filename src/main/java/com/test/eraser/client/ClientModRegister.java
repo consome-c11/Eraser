@@ -9,13 +9,8 @@ import com.test.eraser.entity.HomingArrowEntity;
 import com.test.eraser.gui.ClientBagGui;
 import com.test.eraser.utils.Res;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -32,7 +27,7 @@ public class ClientModRegister {
                 context -> new ArrowRenderer<HomingArrowEntity>(context) {
                     @Override
                     public ResourceLocation getTextureLocation(HomingArrowEntity entity) {
-                        return  Res.getResource("minecraft", "textures/entity/projectiles/arrow.png");
+                        return Res.getResource("minecraft", "textures/entity/projectiles/arrow.png");
                     }
                 });
 

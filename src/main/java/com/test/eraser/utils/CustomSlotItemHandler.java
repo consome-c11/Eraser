@@ -1,8 +1,8 @@
 package com.test.eraser.utils;
 
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomSlotItemHandler extends SlotItemHandler {

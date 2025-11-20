@@ -10,8 +10,8 @@ public abstract class LevelChunkSectionMixin implements ILevelChunkSection {
 
     @Override
     public BlockState forceSetBlockState(int x, int y, int z, BlockState newState, boolean useChecked) {
-        LevelChunkSection self = (LevelChunkSection)(Object)this;
-        LevelChunkSectionAccessor acc = (LevelChunkSectionAccessor)(Object)self;
+        LevelChunkSection self = (LevelChunkSection) (Object) this;
+        LevelChunkSectionAccessor acc = (LevelChunkSectionAccessor) self;
 
         BlockState oldState = useChecked
                 ? acc.getStates().getAndSet(x, y, z, newState)

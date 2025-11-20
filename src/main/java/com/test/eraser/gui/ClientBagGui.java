@@ -5,13 +5,11 @@ import com.test.eraser.network.packets.ChangeBagPagePacket;
 import com.test.eraser.network.packets.SortBagPacket;
 import com.test.eraser.utils.ClientBagCache;
 import com.test.eraser.utils.CustomItemStackHandler;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -22,24 +20,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.*;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
-
 @OnlyIn(Dist.CLIENT)
 public class ClientBagGui extends AbstractContainerScreen<BagMenu> {
+    private final Set<Integer> matchingSlots = new HashSet<>();
     private int currentPage;
     private UUID bagId;
-
     private List<ItemStack> prevPage = Collections.emptyList();
     private List<ItemStack> nextPage = Collections.emptyList();
     private List<ItemStack> currentPageItems = Collections.emptyList();
-
     private Button prevButton;
     private Button nextButton;
     private Button sortByNameButton;
-
     private EditBox searchBox;
     private String lastSearchText = "";
-    private Set<Integer> matchingSlots = new HashSet<>();
 
     public ClientBagGui(BagMenu menu, Inventory playerInv, Component title) {
         super(menu, playerInv, title);
@@ -189,7 +182,7 @@ public class ClientBagGui extends AbstractContainerScreen<BagMenu> {
         this.searchBox.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         for (int slotIndex : this.matchingSlots) {
-            if(Objects.equals(lastSearchText, ""))break;
+            if (Objects.equals(lastSearchText, "")) break;
             if (slotIndex >= 0 && slotIndex < 54) {
                 Slot slot = this.menu.getSlot(slotIndex);
 

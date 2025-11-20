@@ -13,11 +13,7 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class SyncBagPagesPacket {
     private final UUID bagId;

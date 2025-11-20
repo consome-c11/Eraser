@@ -1,7 +1,7 @@
 package com.test.eraser.gui;
 
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container; // 注意: net.minecraft.world.entity.player.Container ではない
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 

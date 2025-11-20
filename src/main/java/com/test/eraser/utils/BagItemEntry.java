@@ -1,26 +1,15 @@
 package com.test.eraser.utils;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
 
-public class BagItemEntry {
-    private final Item item;
-    private final long count;
-    private final CompoundTag tag;
-
-    public BagItemEntry(Item item, long count, CompoundTag tag) {
-        this.item = item;
-        this.count = count;
-        this.tag = tag;
-    }
-
-    public Item getItem() { return item; }
-    public long getCount() { return count; }
-    public CompoundTag getTag() { return tag; }
+public record BagItemEntry(Item item, long count, CompoundTag tag) {
 
     public static BagItemEntry fromItemStack(ItemStack stack) {
         if (stack.isEmpty()) {
@@ -29,12 +18,26 @@ public class BagItemEntry {
         return new BagItemEntry(stack.getItem(), stack.getCount(), stack.getTag());
     }
 
+    @SuppressWarnings("removal")
+    public static BagItemEntry deserializeNBT(CompoundTag nbt) {
+        String itemId = nbt.getString("id");
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemId));
+        if (item == null) {
+            System.err.println("Unknown item ID: " + itemId);
+            return new BagItemEntry(Items.AIR, 0, null);
+        }
+        long count = nbt.getLong("Count"); // getLong を使用
+        CompoundTag tag = nbt.contains("tag") ? nbt.getCompound("tag") : null;
+
+        return new BagItemEntry(item, count, tag);
+    }
+
     // BagItemEntry.java
     public ItemStack toItemStack() {
         // ログ: toItemStack が呼ばれた
         LOGGER.debug("BagItemEntry.toItemStack called. Item: {}, Long Count: {}, Tag: {}", this.item, this.count, this.tag);
 
-        if (this.item == null || this.item == net.minecraft.world.item.Items.AIR) {
+        if (this.item == null || this.item == Items.AIR) {
             LOGGER.debug("BagItemEntry.item is null or AIR, returning EMPTY.");
             return ItemStack.EMPTY;
         }
@@ -68,19 +71,5 @@ public class BagItemEntry {
             nbt.put("tag", this.tag.copy());
         }
         return nbt;
-    }
-
-    @SuppressWarnings("removal")
-    public static BagItemEntry deserializeNBT(CompoundTag nbt) {
-        String itemId = nbt.getString("id");
-        Item item = ForgeRegistries.ITEMS.getValue(new net.minecraft.resources.ResourceLocation(itemId));
-        if (item == null) {
-            System.err.println("Unknown item ID: " + itemId);
-            return new BagItemEntry(net.minecraft.world.item.Items.AIR, 0, null);
-        }
-        long count = nbt.getLong("Count"); // getLong を使用
-        CompoundTag tag = nbt.contains("tag") ? nbt.getCompound("tag") : null;
-
-        return new BagItemEntry(item, count, tag);
     }
 }

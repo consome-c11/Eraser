@@ -15,7 +15,6 @@
     "client.ClientLevelAccessor",
     "client.ClientLevelMixin",
     "client.LivingEntityMixin",
-    "client.LevelMixin",
     "client.BossHelthOverlayAccessor",
     "client.EntityMixin",
     "snackprotector.GameRendererMixin"
@@ -45,12 +44,13 @@
     "eraser.ChunkSerializerMixin",
     "snackprotector.LivingEntityMixin",
     "world_destroyer.ServerLevelMixin",
-    "world_destroyer.ServerLevelAccessor",
     "world_destroyer.LevelChunkMixin",
     "world_destroyer.LevelChunkAccessor",
     "world_destroyer.LevelChunkSectionAccessor",
     "world_destroyer.LevelChunkSectionMixin",
-    "world_destroyer.BlockStateBaseMixin"
+    "world_destroyer.BlockStateBaseMixin",
+    "common.InventoryMixin",
+    "common.ServerPlayerMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

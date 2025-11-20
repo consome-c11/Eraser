@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
 import com.test.eraser.logic.ILivingEntity;
-import com.test.eraser.network.packets.DestroyBlockPacket;
 import com.test.eraser.network.PacketHandler;
+import com.test.eraser.network.packets.DestroyBlockPacket;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
@@ -21,8 +21,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -54,7 +52,9 @@ import static com.test.eraser.utils.RenderUtils.renderBlockList;
 public class ClientEvents {
 
     public static final List<Entity> erasedEntities = new ArrayList<>();
+    private static final Map<UUID, Long> lastUpdate = new HashMap<>();
     private static int tick = 0;
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
@@ -67,18 +67,17 @@ public class ClientEvents {
             boolean same_id = DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID || DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID_ORE;
             Predicate<BlockState> accept = state -> !state.isAir();
             BlockState LookBlockState = mc.level.getBlockState(blockHit.getBlockPos());
-            if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID_ORE) {
+            if (DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID_ORE) {
                 TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
                 accept = state -> state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
-            }
-            else if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID){
+            } else if (DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID) {
                 accept = state -> state.is(LookBlockState.getBlock());
             }
-            if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.NORMAL || mc.player.getMainHandItem().getItem() != ModItems.WORLD_DESTROYER.get() ) {
+            if (DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.NORMAL || mc.player.getMainHandItem().getItem() != ModItems.WORLD_DESTROYER.get()) {
                 RenderQueue.clear();
-            }
-            else QueueRenderBreakBlock(mc.level, mc.player, blockHit.getBlockPos(),DestroyMode.getMode(mc.player.getMainHandItem()),same_id,32,accept);
-        }else RenderQueue.clear();
+            } else
+                QueueRenderBreakBlock(mc.level, mc.player, blockHit.getBlockPos(), DestroyMode.getMode(mc.player.getMainHandItem()), same_id, 32, accept);
+        } else RenderQueue.clear();
         erase();
         ItemStack stack = mc.player.getMainHandItem();
         if (stack.getItem() == ModItems.ERASER_ITEM.get()) {
@@ -123,7 +122,7 @@ public class ClientEvents {
         }
 
         if (isInGameWorld() && mc.options.keyAttack.isDown() && stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
-            if(mc.options.keyShift.isDown() && tick < 7){
+            if (mc.options.keyShift.isDown() && tick < 7) {
                 tick++;
                 return;
             }
@@ -166,10 +165,9 @@ public class ClientEvents {
             if (player == null) return;
             ItemStack stack = serverPlayer.getMainHandItem();
             if (isInGameWorld() && stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
-                if(!player.isShiftKeyDown()) {
+                if (!player.isShiftKeyDown()) {
                     //WorldDestroyerUtils.destroyblock(serverPlayer.getMainHandItem(), serverPlayer);
-                }
-                else{
+                } else {
                     event.setCanceled(true);
                 }
             }
@@ -192,8 +190,7 @@ public class ClientEvents {
                 EntityHitResult entityHit = (EntityHitResult) hit;
                 int id = entityHit.getEntity().getId();
                 PacketHandler.CHANNEL.sendToServer(new RayCastPacket(id));
-            }
-            else {
+            } else {
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (player == null) return;
 
@@ -213,9 +210,6 @@ public class ClientEvents {
 
 
     }
-    public static boolean isInGameWorld() {
-        return Minecraft.getInstance().screen == null;
-    }
     /*@SubscribeEvent //shitty shield effect rendering
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
@@ -228,7 +222,9 @@ public class ClientEvents {
         }
     }*/
 
-    private static final Map<UUID, Long> lastUpdate = new HashMap<>();
+    public static boolean isInGameWorld() {
+        return Minecraft.getInstance().screen == null;
+    }
 
     @SubscribeEvent
     public static void onRenderLiving(RenderLivingEvent.Pre<LivingEntity, ?> event) {
@@ -245,19 +241,6 @@ public class ClientEvents {
                 lastUpdate.put(uuid, now);
             }
             if (entity.deathTime > 20) event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void onEntityJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getEntity() instanceof ILivingEntity living) {
-            if (living.isErased()) {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc == null || mc.player == null || mc.level == null) return;
-
-                //System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
-                //event.setCanceled(true);
-            }
         }
     }
 
@@ -301,6 +284,20 @@ public class ClientEvents {
 
             ItemStack stack = mc.player.getMainHandItem();
 
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof ILivingEntity living) {
+            if (living.isErased()) {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc == null || mc.player == null || mc.level == null) {
+                }
+
+                //System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
+                //event.setCanceled(true);
+            }
         }
     }
 

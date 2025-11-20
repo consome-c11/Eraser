@@ -1,7 +1,7 @@
 package com.test.eraser.utils;
 
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomItemStackHandler extends ItemStackHandler {

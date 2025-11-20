@@ -16,12 +16,8 @@ import java.util.function.Supplier;
 // from: HyperLink/helper/Deets.java
 
 public class Deets {
-    private Deets() {
-    }
-
     public static final String HYPERDAIMC = "hyperdaimc";
     public static final Logger LOG = LoggerFactory.getLogger(HYPERDAIMC);
-
     public static final String CURIOS = "curios";
     public static final String EMBEDDIUM = "embeddium";
     public static final String MEKANISM = "mekanism";
@@ -30,7 +26,8 @@ public class Deets {
     public static final String SLASHBLADE = "slashblade";
     public static final String IRONS_SPELLBOOKS = "irons_spellbooks";
     public static final String ERASER = "eraser";
-
+    private Deets() {
+    }
 
     public static Act require(String modid) {
         return FMLLoader.getLoadingModList().getModFileById(modid) != null ? Act.TRUE : Act.FALSE;

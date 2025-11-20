@@ -85,7 +85,7 @@ public class SnackArmor {
     public static class SnackProtector {
 
         public static boolean isFullSet(Player player) {
-            if(player == null || player.getInventory() == null) return false;
+            if (player == null || player.getInventory() == null) return false;
             ItemStack head = player.getInventory().armor.get(3);
             ItemStack chest = player.getInventory().armor.get(2);
             ItemStack legs = player.getInventory().armor.get(1);

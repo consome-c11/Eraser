@@ -2,14 +2,11 @@ package com.test.eraser.utils;
 
 import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.entity.PartEntity;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Eraser_Utils {
     public static Entity findParentEntity(Entity self, double searchRadius) {
@@ -42,7 +39,7 @@ public class Eraser_Utils {
                 return true;
             }
         }
-        if(self instanceof ILivingEntity entity && attacker instanceof Player player)
+        if (self instanceof ILivingEntity entity && attacker instanceof Player player)
             entity.instantKill(player, false);
 
         return false;
@@ -56,7 +53,7 @@ public class Eraser_Utils {
                 return true;
             }
         }
-        if(self instanceof ILivingEntity entity && attacker instanceof Player player)
+        if (self instanceof ILivingEntity entity && attacker instanceof Player player)
             entity.instantKill(player, skipAnimation);
 
         return false;

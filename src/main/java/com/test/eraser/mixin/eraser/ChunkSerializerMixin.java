@@ -2,8 +2,6 @@ package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.Config;
 import com.test.eraser.logic.ILivingEntity;
-import com.test.eraser.utils.EraseEntityLookupBridge;
-import com.test.eraser.utils.SynchedEntityDataUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ClassInstanceMultiMap;
@@ -13,7 +11,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkSerializer;
-import net.minecraft.world.level.entity.*;
+import net.minecraft.world.level.entity.EntitySection;
+import net.minecraft.world.level.entity.EntitySectionStorage;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -42,7 +42,8 @@ public class ChunkSerializerMixin {
         });
         acc.getKnownUuids().removeIf(uuid -> {
             Entity e = level.getEntity(uuid);
-            if((e instanceof ILivingEntity living) && living.isErased() && !Config.isNormalDieEntity(e)) System.out.println("[Eraser] Removed entity UUID from knownUuids: " + uuid);
+            if ((e instanceof ILivingEntity living) && living.isErased() && !Config.isNormalDieEntity(e))
+                System.out.println("[Eraser] Removed entity UUID from knownUuids: " + uuid);
             return (e instanceof ILivingEntity living) && living.isErased();
         });
 

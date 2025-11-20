@@ -2,6 +2,7 @@ package com.test.eraser.network;
 
 import com.test.eraser.network.packets.*;
 import net.minecraftforge.network.NetworkDirection;
+
 import java.util.Optional;
 
 public class ModPackets {

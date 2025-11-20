@@ -1,7 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.logic.ILivingEntity;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.spongepowered.asm.mixin.Mixin;

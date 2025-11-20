@@ -17,7 +17,6 @@ public abstract class GameRendererMixin {
         if (entity instanceof Player player) if (SnackArmor.SnackProtector.isFullSet(player)) {
             cir.setReturnValue(1.0F);
             //cir.cancel();
-            return;
         }
     }
 }

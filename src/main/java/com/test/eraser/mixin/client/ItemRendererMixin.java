@@ -39,16 +39,12 @@ public abstract class ItemRendererMixin {
     private static List<String> AFFECTED_ITEM_IDS = List.of(
             "eraser:eraser_eraser"
     );
-
     @Unique
-    public List<String> getAffectedItemIds() {
-        return AFFECTED_ITEM_IDS;
-    }
-
+    private static DynamicTexture dynTex = null;
     @Unique
-    public boolean add_toAffectedItemIds(String id) {
-        return AFFECTED_ITEM_IDS.add(id);
-    }
+    private static ResourceLocation dynLoc = null;
+    @Unique
+    private static NativeImage img = null;
 
     @Unique
     private static List<Item> getAffectedItems() {
@@ -95,29 +91,6 @@ public abstract class ItemRendererMixin {
         return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 
-    @Inject(
-            method = "render",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;getFoilBufferDirect(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;",
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void eraser$injectFoilBuffer(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
-                                         PoseStack poseStack, MultiBufferSource buffer,
-                                         int packedLight, int packedOverlay, BakedModel model,
-                                         CallbackInfo ci) {
-        if (shouldAffect(stack, ctx)) {
-            long time = System.currentTimeMillis();
-            int argb = waveGrayWhiteColor(time, 0, 700.0);
-            float r = ((argb >> 16) & 0xFF) / 255f;
-            float g = ((argb >> 8) & 0xFF) / 255f;
-            float b = (argb & 0xFF) / 255f;
-            float a = ((argb >> 24) & 0xFF) / 255f;
-
-        }
-    }
-
     /*@Inject(method = "render", at = @At("HEAD"))
     private void eraser$injectDynamic(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
                                       PoseStack poseStack, MultiBufferSource buffer,
@@ -141,15 +114,6 @@ public abstract class ItemRendererMixin {
     }*/
 
     @Unique
-    private static DynamicTexture dynTex = null;
-
-    @Unique
-    private static ResourceLocation dynLoc = null;
-
-    @Unique
-    private static NativeImage img = null;
-
-    @Unique
     private static void initTexture() {
         if (dynTex == null) {
             img = new NativeImage(16, 16, true); // 16x16 RGBA?
@@ -158,6 +122,40 @@ public abstract class ItemRendererMixin {
                     .register("eraser:item_overlay", dynTex);
         }
     }
+
+    @Unique
+    public List<String> getAffectedItemIds() {
+        return AFFECTED_ITEM_IDS;
+    }
+
+    @Unique
+    public boolean add_toAffectedItemIds(String id) {
+        return AFFECTED_ITEM_IDS.add(id);
+    }
+
+    @Inject(
+            method = "render",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;getFoilBufferDirect(Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/RenderType;ZZ)Lcom/mojang/blaze3d/vertex/VertexConsumer;",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void eraser$injectFoilBuffer(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
+                                         PoseStack poseStack, MultiBufferSource buffer,
+                                         int packedLight, int packedOverlay, BakedModel model,
+                                         CallbackInfo ci) {
+        if (shouldAffect(stack, ctx)) {
+            long time = System.currentTimeMillis();
+            int argb = waveGrayWhiteColor(time, 0, 700.0);
+            float r = ((argb >> 16) & 0xFF) / 255f;
+            float g = ((argb >> 8) & 0xFF) / 255f;
+            float b = (argb & 0xFF) / 255f;
+            float a = ((argb >> 24) & 0xFF) / 255f;
+
+        }
+    }
+
     @Inject(method = "render", at = @At("HEAD"))
     private void eraser$rotateInGui(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                     PoseStack poseStack, MultiBufferSource buffer, int packedLight,

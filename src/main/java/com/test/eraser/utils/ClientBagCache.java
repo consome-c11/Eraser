@@ -26,5 +26,6 @@ public class ClientBagCache {
     public record CachedBagData(int page,
                                 List<ItemStack> prev,
                                 List<ItemStack> current,
-                                List<ItemStack> next) {}
+                                List<ItemStack> next) {
+    }
 }

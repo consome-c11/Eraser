@@ -140,11 +140,11 @@ public abstract class ItemStackDisplayMixin {
         if (applycolorname(stack)) {
             String text = cir.getReturnValue().getString(); //after rename
             long time = System.currentTimeMillis() / 50;
-            if(stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
+            if (stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
                 text += " Mode:[";
                 text += DestroyMode.getMode(stack);
                 text += "]";
-                if(DestroyMode.isSilkTouchEnabled(stack)) {
+                if (DestroyMode.isSilkTouchEnabled(stack)) {
                     text += " [SilkTouch Enabled]";
                 }
             }

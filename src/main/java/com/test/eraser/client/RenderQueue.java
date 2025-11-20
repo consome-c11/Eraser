@@ -29,13 +29,6 @@ public class RenderQueue {
     }
 
 
-    public static class RenderEntry {
-        public final BlockPos pos;
-        public final int color;
-
-        public RenderEntry(BlockPos pos, int color) {
-            this.pos = pos;
-            this.color = color;
-        }
+    public record RenderEntry(BlockPos pos, int color) {
     }
 }

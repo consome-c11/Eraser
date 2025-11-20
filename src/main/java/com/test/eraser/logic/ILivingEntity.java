@@ -1,11 +1,7 @@
 package com.test.eraser.logic;
 
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public interface ILivingEntity {

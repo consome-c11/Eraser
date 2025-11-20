@@ -1,7 +1,6 @@
 package com.test.eraser.additional;
 
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.InstrumentTags;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeTier;

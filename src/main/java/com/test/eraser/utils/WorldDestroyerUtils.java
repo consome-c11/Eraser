@@ -1,15 +1,12 @@
 package com.test.eraser.utils;
 
-import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.logic.DestroyBlock;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -18,10 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.function.Predicate;
 
@@ -68,13 +61,12 @@ public class WorldDestroyerUtils {
                 }
                 default -> DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
             }
-        }
-        else if(stack.getItem() == ModItems.ERASER_ITEM.get()){
+        } else if (stack.getItem() == ModItems.ERASER_ITEM.get()) {
             Predicate<BlockState> LogPredicate = state ->
                     state.is(BlockTags.LOGS);
-            if(getPlayerLookingAt(player,5) != null && !player.level().getBlockState(getPlayerLookingAt(player,5).getBlockPos()).isAir()) {
-                DestroyBlock.breakSameId((ServerLevel) player.level(), player, getPlayerLookingAt(player,5).getBlockPos(), player.getMainHandItem(), 7, false, 7, LogPredicate);
-                DestroyBlock.breakAreaWithFortune((ServerLevel) player.level(), player, getPlayerLookingAt(player,5).getBlockPos(), DestroyMode.NORMAL, player.getMainHandItem(), 7);
+            if (getPlayerLookingAt(player, 5) != null && !player.level().getBlockState(getPlayerLookingAt(player, 5).getBlockPos()).isAir()) {
+                DestroyBlock.breakSameId((ServerLevel) player.level(), player, getPlayerLookingAt(player, 5).getBlockPos(), player.getMainHandItem(), 7, false, 7, LogPredicate);
+                DestroyBlock.breakAreaWithFortune((ServerLevel) player.level(), player, getPlayerLookingAt(player, 5).getBlockPos(), DestroyMode.NORMAL, player.getMainHandItem(), 7);
             }
         }
         return true;

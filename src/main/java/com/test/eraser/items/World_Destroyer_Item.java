@@ -1,16 +1,7 @@
 package com.test.eraser.items;
 
-import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModTiers;
-import com.test.eraser.logic.DestroyBlock;
-import com.test.eraser.utils.DestroyMode;
-import com.test.eraser.utils.Res;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -20,16 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
 
@@ -119,13 +104,6 @@ public class World_Destroyer_Item extends PickaxeItem {
         tooltip.add(3, waveLine2);
     }
 
-    @Override
-    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        killIfParentFound(target, player, 32);
-        if(!(target instanceof LivingEntity))target.kill();
-        return false;
-    }
-
     /*public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
         if (!(entity instanceof ServerPlayer player)) return false;
         if (player.isSleeping()) {
@@ -171,23 +149,11 @@ public class World_Destroyer_Item extends PickaxeItem {
         return true;
     }*/
 
-    public static BlockHitResult getPlayerLookingAt(Player player) {
-        Level level = player.level();
-        double reachDistance = 5.0;
-
-        Vec3 eyePosition = player.getEyePosition();
-        Vec3 lookVector = player.getLookAngle().scale(reachDistance);
-        Vec3 endPosition = eyePosition.add(lookVector);
-
-        ClipContext context = new ClipContext(
-                eyePosition,
-                endPosition,
-                ClipContext.Block.OUTLINE,
-                ClipContext.Fluid.ANY,
-                player
-        );
-
-        return level.clip(context);
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
+        killIfParentFound(target, player, 32);
+        if (!(target instanceof LivingEntity)) target.kill();
+        return false;
     }
 
     @Override

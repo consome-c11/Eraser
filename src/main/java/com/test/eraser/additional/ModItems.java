@@ -2,12 +2,11 @@ package com.test.eraser.additional;
 
 import com.test.eraser.Eraser;
 import com.test.eraser.items.*;
-import com.test.eraser.utils.Deets;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import static com.test.eraser.utils.Deets.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

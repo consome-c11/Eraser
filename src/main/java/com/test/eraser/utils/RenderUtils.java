@@ -1,6 +1,5 @@
 package com.test.eraser.utils;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -11,18 +10,19 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class RenderUtils {
 
-    private RenderUtils() {}
+    private RenderUtils() {
+    }
 
     public static VertexConsumer getBuffer(RenderType type) {
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -48,10 +48,10 @@ public class RenderUtils {
                 poseStack,
                 getBuffer(RenderType.lines()),
                 identity,
-                (float)(color >> 16 & 255) / 255.0F, // R
-                (float)(color >> 8 & 255) / 255.0F,  // G
-                (float)(color & 255) / 255.0F,       // B
-                (float)(color >> 24 & 255) / 255.0F  // A
+                (float) (color >> 16 & 255) / 255.0F, // R
+                (float) (color >> 8 & 255) / 255.0F,  // G
+                (float) (color & 255) / 255.0F,       // B
+                (float) (color >> 24 & 255) / 255.0F  // A
         );
 
         endBatch(RenderType.lines());
@@ -62,47 +62,47 @@ public class RenderUtils {
                                        List<BlockPos> positions, int color) {
         Set<BlockPos> planned = new HashSet<>(positions);
 
-        float r = (float)(color >> 16 & 255) / 255.0F;
-        float g = (float)(color >> 8 & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;
-        float a = (float)(color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+        float a = (float) (color >> 24 & 255) / 255.0F;
 
         VertexConsumer builder = getBuffer(RenderType.lines());
 
         final float[][] EDGES = new float[][]{
-                {0,0,0, 1,0,0, 0,-1,0}, // edge 0: (0,0,0)-(1,0,0)
-                {1,0,0, 1,0,1, 0,-1,0}, // edge 1: (1,0,0)-(1,0,1)
-                {0,0,1, 1,0,1, 0,-1,0}, // edge 2: (0,0,1)-(1,0,1)
-                {0,0,0, 0,0,1, 0,-1,0}, // edge 3: (0,0,0)-(0,0,1)
+                {0, 0, 0, 1, 0, 0, 0, -1, 0}, // edge 0: (0,0,0)-(1,0,0)
+                {1, 0, 0, 1, 0, 1, 0, -1, 0}, // edge 1: (1,0,0)-(1,0,1)
+                {0, 0, 1, 1, 0, 1, 0, -1, 0}, // edge 2: (0,0,1)-(1,0,1)
+                {0, 0, 0, 0, 0, 1, 0, -1, 0}, // edge 3: (0,0,0)-(0,0,1)
 
-                {0,1,0, 1,1,0, 0,1,0},  // edge 4: (0,1,0)-(1,1,0)
-                {1,1,0, 1,1,1, 0,1,0},  // edge 5: (1,1,0)-(1,1,1)
-                {0,1,1, 1,1,1, 0,1,0},  // edge 6: (0,1,1)-(1,1,1)
-                {0,1,0, 0,1,1, 0,1,0},  // edge 7: (0,1,0)-(0,1,1)
+                {0, 1, 0, 1, 1, 0, 0, 1, 0},  // edge 4: (0,1,0)-(1,1,0)
+                {1, 1, 0, 1, 1, 1, 0, 1, 0},  // edge 5: (1,1,0)-(1,1,1)
+                {0, 1, 1, 1, 1, 1, 0, 1, 0},  // edge 6: (0,1,1)-(1,1,1)
+                {0, 1, 0, 0, 1, 1, 0, 1, 0},  // edge 7: (0,1,0)-(0,1,1)
 
-                {0,0,0, 0,1,0, -1,0,0}, // edge 8:  (0,0,0)-(0,1,0)
-                {0,0,1, 0,1,1, -1,0,0}, // edge 9:  (0,0,1)-(0,1,1)
+                {0, 0, 0, 0, 1, 0, -1, 0, 0}, // edge 8:  (0,0,0)-(0,1,0)
+                {0, 0, 1, 0, 1, 1, -1, 0, 0}, // edge 9:  (0,0,1)-(0,1,1)
 
-                {1,0,0, 1,1,0, 1,0,0},  // edge10:  (1,0,0)-(1,1,0)
-                {1,0,1, 1,1,1, 1,0,0},  // edge11:  (1,0,1)-(1,1,1)
+                {1, 0, 0, 1, 1, 0, 1, 0, 0},  // edge10:  (1,0,0)-(1,1,0)
+                {1, 0, 1, 1, 1, 1, 1, 0, 0},  // edge11:  (1,0,1)-(1,1,1)
         };
 
         final int[][][] NEIGHBORS = new int[][][]{
-                {{0,-1,0}, {0,0,-1}}, // edge0: (0,0,0)-(1,0,0)  下 / 北
-                {{0,-1,0}, {1,0,0}},  // edge1: (1,0,0)-(1,0,1)  下 / 東
-                {{0,-1,0}, {0,0,1}},  // edge2: (0,0,1)-(1,0,1)  下 / 南
-                {{0,-1,0}, {-1,0,0}}, // edge3: (0,0,0)-(0,0,1)  下 / 西
+                {{0, -1, 0}, {0, 0, -1}}, // edge0: (0,0,0)-(1,0,0)  下 / 北
+                {{0, -1, 0}, {1, 0, 0}},  // edge1: (1,0,0)-(1,0,1)  下 / 東
+                {{0, -1, 0}, {0, 0, 1}},  // edge2: (0,0,1)-(1,0,1)  下 / 南
+                {{0, -1, 0}, {-1, 0, 0}}, // edge3: (0,0,0)-(0,0,1)  下 / 西
 
-                {{0,1,0},  {0,0,-1}}, // edge4: (0,1,0)-(1,1,0)  上 / 北
-                {{0,1,0},  {1,0,0}},  // edge5: (1,1,0)-(1,1,1)  上 / 東
-                {{0,1,0},  {0,0,1}},  // edge6: (0,1,1)-(1,1,1)  上 / 南
-                {{0,1,0},  {-1,0,0}}, // edge7: (0,1,0)-(0,1,1)  上 / 西
+                {{0, 1, 0}, {0, 0, -1}}, // edge4: (0,1,0)-(1,1,0)  上 / 北
+                {{0, 1, 0}, {1, 0, 0}},  // edge5: (1,1,0)-(1,1,1)  上 / 東
+                {{0, 1, 0}, {0, 0, 1}},  // edge6: (0,1,1)-(1,1,1)  上 / 南
+                {{0, 1, 0}, {-1, 0, 0}}, // edge7: (0,1,0)-(0,1,1)  上 / 西
 
-                {{-1,0,0}, {0,0,-1}}, // edge8: (0,0,0)-(0,1,0)  西 / 北
-                {{-1,0,0}, {0,0,1}},  // edge9: (0,0,1)-(0,1,1)  西 / 南
+                {{-1, 0, 0}, {0, 0, -1}}, // edge8: (0,0,0)-(0,1,0)  西 / 北
+                {{-1, 0, 0}, {0, 0, 1}},  // edge9: (0,0,1)-(0,1,1)  西 / 南
 
-                {{1,0,0},  {0,0,-1}}, // edge10: (1,0,0)-(1,1,0) 東 / 北
-                {{1,0,0},  {0,0,1}},  // edge11: (1,0,1)-(1,1,1) 東 / 南
+                {{1, 0, 0}, {0, 0, -1}}, // edge10: (1,0,0)-(1,1,0) 東 / 北
+                {{1, 0, 0}, {0, 0, 1}},  // edge11: (1,0,1)-(1,1,1) 東 / 南
         };
 
         for (BlockPos pos : positions) {

@@ -1,23 +1,10 @@
 package com.test.eraser.items;
 
 import com.test.eraser.additional.ModTiers;
-import com.test.eraser.entity.HomingArrowEntity;
-import com.test.eraser.logic.DestroyBlock;
-import com.test.eraser.logic.ILivingEntity;
-import com.test.eraser.utils.DestroyMode;
-import io.redspace.ironsspellbooks.player.ClientPlayerEvents;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ServerPlayerGameMode;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,16 +13,12 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
 
@@ -55,15 +38,33 @@ public class Eraser_Item extends SwordItem {
         return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 
+    public static BlockHitResult getPlayerLookingAt(Player player, int reach) {
+        Level level = player.level();
+
+        Vec3 eyePosition = player.getEyePosition();
+        Vec3 lookVector = player.getLookAngle().scale(reach);
+        Vec3 endPosition = eyePosition.add(lookVector);
+
+        ClipContext context = new ClipContext(
+                eyePosition,
+                endPosition,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.ANY,
+                player
+        );
+
+        return level.clip(context);
+    }
+
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
         killIfParentFound(target, player, 32);
-        if(!(target instanceof LivingEntity))target.kill();
+        if (!(target instanceof LivingEntity)) target.kill();
         return true;
     }
 
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        if(entity instanceof ServerPlayer player) {
+        if (entity instanceof ServerPlayer player) {
             if (player.isSleeping()) {
                 return false;
             }
@@ -75,7 +76,8 @@ public class Eraser_Item extends SwordItem {
             }*/
             HitResult hitResult = player.pick(5, 1.0f, true);
 
-            if(!player.level().getBlockState(getPlayerLookingAt(player,7).getBlockPos()).isAir() || hitResult.getType() == HitResult.Type.ENTITY) return false;
+            if (!player.level().getBlockState(getPlayerLookingAt(player, 7).getBlockPos()).isAir() || hitResult.getType() == HitResult.Type.ENTITY)
+                return false;
             List<Entity> entities = findEntitiesInCone(player, 3.5, 45.0);
 
             for (Entity ent : entities) {
@@ -112,24 +114,6 @@ public class Eraser_Item extends SwordItem {
 
             return angleBetween <= angle;
         });
-    }
-
-    public static BlockHitResult getPlayerLookingAt(Player player, int reach) {
-        Level level = player.level();
-
-        Vec3 eyePosition = player.getEyePosition();
-        Vec3 lookVector = player.getLookAngle().scale(reach);
-        Vec3 endPosition = eyePosition.add(lookVector);
-
-        ClipContext context = new ClipContext(
-                eyePosition,
-                endPosition,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.ANY,
-                player
-        );
-
-        return level.clip(context);
     }
 
     @Override

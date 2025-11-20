@@ -13,8 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/*"CreativeModeInventoryScreenMixin",
-    "CreativeModeInventoryScreenAccess",*/
 @Mixin(CreativeModeInventoryScreen.class)
 public abstract class CreativeModeInventoryScreenMixin
         extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu> {

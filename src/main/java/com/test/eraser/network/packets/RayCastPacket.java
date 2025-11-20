@@ -1,7 +1,6 @@
 package com.test.eraser.network.packets;
 
 import com.test.eraser.additional.ModItems;
-import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.mixin.client.BossHelthOverlayAccessor;
 import com.test.eraser.utils.Eraser_Utils;
 import net.minecraft.client.Minecraft;
@@ -10,7 +9,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -34,16 +32,16 @@ public class RayCastPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer sender = ctx.get().getSender();
             Item held = sender.getMainHandItem().getItem();
-            if(held != ModItems.ERASER_ITEM.get() && held != ModItems.WORLD_DESTROYER.get()) {
+            if (held != ModItems.ERASER_ITEM.get() && held != ModItems.WORLD_DESTROYER.get()) {
                 return;//ah
             }
             if (sender != null) {
                 Entity target = sender.level().getEntity(msg.entityId);
-                if(sender.level().isClientSide()) return;
+                if (sender.level().isClientSide()) return;
                 if (target != null && sender.getPosition(0).distanceTo(target.getPosition(0)) <= 4) {
                     Minecraft mc = Minecraft.getInstance();
-                    ((BossHelthOverlayAccessor)mc.gui.getBossOverlay()).getEvents().remove(target.getUUID());
-                    Eraser_Utils.killIfParentFound(target, (Player)sender, 32);
+                    ((BossHelthOverlayAccessor) mc.gui.getBossOverlay()).getEvents().remove(target.getUUID());
+                    Eraser_Utils.killIfParentFound(target, sender, 32);
 
                     //System.out.println("RayCastPacket: processed entity ID " + msg.entityId);
                 }

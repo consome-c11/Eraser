@@ -15,6 +15,7 @@ public enum DestroyMode {
     private static final String SILK_KEY = "SilkTouchEnabled";
     public final int x, y, z;
     public final int yOffset;
+
     DestroyMode(int x, int y, int z, int yOffset) {
         this.x = x;
         this.y = y;

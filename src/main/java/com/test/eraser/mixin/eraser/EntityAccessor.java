@@ -9,6 +9,11 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Entity.class)
 public interface EntityAccessor {
 
+    @Accessor("DATA_POSE")
+    static EntityDataAccessor<Float> getDataPoseId() {
+        throw new AssertionError();
+    }
+
     @Accessor("removalReason")
     Entity.RemovalReason getRemovalReason();
 
@@ -20,9 +25,4 @@ public interface EntityAccessor {
 
     @Accessor("levelCallback")
     void setlevelCallback(EntityInLevelCallback callback);
-
-    @Accessor("DATA_POSE")
-    static EntityDataAccessor<Float> getDataPoseId() {
-        throw new AssertionError();
-    }
 }

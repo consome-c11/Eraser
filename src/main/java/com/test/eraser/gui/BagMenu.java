@@ -1,14 +1,10 @@
 package com.test.eraser.gui;
 
 import com.test.eraser.additional.ModMenus;
-import com.test.eraser.network.PacketHandler;
-import com.test.eraser.network.packets.SyncBagPagesPacket;
 import com.test.eraser.utils.BagSavedData;
 import com.test.eraser.utils.CustomItemStackHandler;
 import com.test.eraser.utils.CustomSlotItemHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,18 +13,16 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class BagMenu extends AbstractContainerMenu {
-    private final UUID bagId;
-    private int page;
-    private final int totalPages;
     public final CustomItemStackHandler customItemHandler;
+    private final UUID bagId;
+    private final int totalPages;
+    private int page;
 
     public BagMenu(int windowId, Inventory playerInv, UUID bagId, int page, int totalPages) {
         super(ModMenus.BAG_MENU.get(), windowId);
@@ -56,9 +50,36 @@ public class BagMenu extends AbstractContainerMenu {
         layoutSlots(playerInv);
     }
 
-    public UUID getBagId() { return bagId; }
-    public int getPage() { return page; }
-    public int getTotalPages() { return totalPages; }
+    public UUID getBagId() {
+        return bagId;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int newPage) {
+        this.page = newPage;
+        Player player = this.getPlayer();
+        if (player != null) {
+            BagSavedData data = BagSavedData.get(player.level());
+            List<ItemStack> pageItems = data.getPage(this.bagId, this.page);
+            for (int i = 0; i < customItemHandler.getSlots(); i++) {
+                ItemStack item = ItemStack.EMPTY;
+                if (i < pageItems.size()) {
+                    item = pageItems.get(i).copy();
+                }
+                if (item == null) item = ItemStack.EMPTY;
+                customItemHandler.setStackInSlot(i, item);
+            }
+        } else {
+            System.err.println("Failed to get player in BagMenu.setPage, cannot update inventory.");
+        }
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
 
     private void layoutSlots(Inventory playerInv) {
         for (int row = 0; row < 6; ++row) {
@@ -179,25 +200,6 @@ public class BagMenu extends AbstractContainerMenu {
             }
             if (item == null) item = ItemStack.EMPTY;
             this.customItemHandler.setStackInSlot(i, item);
-        }
-    }
-
-    public void setPage(int newPage) {
-        this.page = newPage;
-        Player player = this.getPlayer();
-        if (player != null) {
-            BagSavedData data = BagSavedData.get(player.level());
-            List<ItemStack> pageItems = data.getPage(this.bagId, this.page);
-            for (int i = 0; i < customItemHandler.getSlots(); i++) {
-                ItemStack item = ItemStack.EMPTY;
-                if (i < pageItems.size()) {
-                    item = pageItems.get(i).copy();
-                }
-                if (item == null) item = ItemStack.EMPTY;
-                customItemHandler.setStackInSlot(i, item);
-            }
-        } else {
-            System.err.println("Failed to get player in BagMenu.setPage, cannot update inventory.");
         }
     }
 

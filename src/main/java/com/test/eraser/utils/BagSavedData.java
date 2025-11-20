@@ -3,11 +3,9 @@ package com.test.eraser.utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
@@ -16,20 +14,15 @@ public class BagSavedData extends SavedData {
 
     private final Map<UUID, List<BagItemEntry>> bags = new HashMap<>();
 
+    public BagSavedData() {
+    }
+
     public static BagSavedData get(Level level) {
         if (level.isClientSide) {
             throw new IllegalStateException("BagSavedData.get() should only be called on server side!");
         }
         return level.getServer().overworld().getDataStorage()
                 .computeIfAbsent(BagSavedData::load, BagSavedData::new, "bag_data");
-    }
-
-    public BagSavedData() {}
-
-    public int getTotalPages(UUID bagId) {
-        List<BagItemEntry> entries = bags.getOrDefault(bagId, Collections.emptyList());
-        int pages = (int)Math.ceil((double)entries.size() / PAGE_SIZE);
-        return Math.max(pages, 1);
     }
 
     public static BagSavedData load(CompoundTag tag) {
@@ -46,6 +39,12 @@ public class BagSavedData extends SavedData {
             data.bags.put(id, entries);
         }
         return data;
+    }
+
+    public int getTotalPages(UUID bagId) {
+        List<BagItemEntry> entries = bags.getOrDefault(bagId, Collections.emptyList());
+        int pages = (int) Math.ceil((double) entries.size() / PAGE_SIZE);
+        return Math.max(pages, 1);
     }
 
     public void setPage(UUID bagId, int page, List<ItemStack> items) {
@@ -76,7 +75,7 @@ public class BagSavedData extends SavedData {
         for (int i = fromIndex; i < fromIndex + PAGE_SIZE; i++) {
             if (i < allEntries.size()) {
                 BagItemEntry entry = allEntries.get(i);
-                if (entry.getCount() > 0 && entry.getItem() != net.minecraft.world.item.Items.AIR) {
+                if (entry.count() > 0 && entry.item() != net.minecraft.world.item.Items.AIR) {
                     itemStacks.add(entry.toItemStack());
                 } else {
                     itemStacks.add(ItemStack.EMPTY);

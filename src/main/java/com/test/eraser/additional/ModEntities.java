@@ -23,7 +23,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<Sand_Bag>> SAND_BAG =
             ENTITIES.register("sand_bag",
-                    () -> EntityType.Builder.<Sand_Bag>of(Sand_Bag::new, MobCategory.MONSTER)
+                    () -> EntityType.Builder.of(Sand_Bag::new, MobCategory.MONSTER)
                             .sized(0.6F, 1.95F)
                             .clientTrackingRange(8)
                             .build("sand_bag"));

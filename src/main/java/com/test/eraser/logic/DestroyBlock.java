@@ -1,8 +1,6 @@
 package com.test.eraser.logic;
 
 import com.test.eraser.client.RenderQueue;
-import com.test.eraser.mixin.world_destroyer.ServerLevelAccessor;
-import com.test.eraser.mixin.world_destroyer.ServerLevelMixin;
 import com.test.eraser.utils.DestroyMode;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
@@ -67,7 +65,7 @@ public class DestroyBlock {
             }
         }
 
-        ((IServerLevel)level).forceSetBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL, true);
+        ((IServerLevel) level).forceSetBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL, true);
 
         for (ItemStack drop : drops) {
             ItemEntity entity = new ItemEntity(level,
@@ -175,6 +173,7 @@ public class DestroyBlock {
                                            ItemStack tool, ResourceLocation blockId) {
         breakSameIdById(level, player, center, tool, 0, true, 32, blockId);
     }
+
     public static void breakSameIdNormal(ServerLevel level, ServerPlayer player, BlockPos center, ItemStack tool) {
         breakSameId(level, player, center, tool, 0, false, 32,
                 state -> state.getBlock() == level.getBlockState(center).getBlock());
@@ -240,9 +239,9 @@ public class DestroyBlock {
                         BlockPos target;
                         switch (facing) {
                             case NORTH -> target = base.offset(dx, dy, -dz);
-                            case WEST  -> target = base.offset(-dz, dy, dx);
-                            case EAST  -> target = base.offset(dz, dy, dx);
-                            default    -> target = base.offset(dx, dy, dz);
+                            case WEST -> target = base.offset(-dz, dy, dx);
+                            case EAST -> target = base.offset(dz, dy, dx);
+                            default -> target = base.offset(dx, dy, dz);
                         }
                         result.add(target);
                     }

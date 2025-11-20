@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback")
 public abstract class PersistentEntitySectionManagerCallbackMixin {
-    @Shadow private Entity realEntity;
+    @Shadow
+    private Entity realEntity;
 
     @Inject(method = "onMove", at = @At("HEAD"), cancellable = true, remap = true)
     private void onMoveGuard(CallbackInfo ci) {

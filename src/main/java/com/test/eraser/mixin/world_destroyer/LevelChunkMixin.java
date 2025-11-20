@@ -17,7 +17,7 @@ public abstract class LevelChunkMixin implements ILevelChunk {
 
     @Override
     public BlockState forceSetBlockState(ServerLevel level, BlockPos pos, BlockState newState, boolean isMoving) {
-        LevelChunk self = (LevelChunk)(Object)this;
+        LevelChunk self = (LevelChunk) (Object) this;
 
         int y = pos.getY();
         int x = pos.getX() & 15;
@@ -25,7 +25,7 @@ public abstract class LevelChunkMixin implements ILevelChunk {
         int localY = y & 15;
 
         LevelChunkSection section = self.getSection(self.getSectionIndex(y));
-        BlockState oldState = ((ILevelChunkSection)section).forceSetBlockState(x, localY, z, newState,true);
+        BlockState oldState = ((ILevelChunkSection) section).forceSetBlockState(x, localY, z, newState, true);
 
         if (oldState == newState) {
             return null;
@@ -50,13 +50,13 @@ public abstract class LevelChunkMixin implements ILevelChunk {
         if (newState.hasBlockEntity()) {
             BlockEntity be = self.getBlockEntity(pos, LevelChunk.EntityCreationType.CHECK);
             if (be == null) {
-                be = ((EntityBlock)newState.getBlock()).newBlockEntity(pos, newState);
+                be = ((EntityBlock) newState.getBlock()).newBlockEntity(pos, newState);
                 if (be != null) {
                     self.addAndRegisterBlockEntity(be);
                 }
             } else {
                 be.setBlockState(newState);
-                ((LevelChunkAccessor)self).invokeUpdateBlockEntityTicker(be);
+                ((LevelChunkAccessor) self).invokeUpdateBlockEntityTicker(be);
             }
         }
 

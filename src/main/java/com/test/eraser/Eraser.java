@@ -3,8 +3,9 @@ package com.test.eraser;
 import com.mojang.logging.LogUtils;
 import com.test.eraser.additional.*;
 import com.test.eraser.network.ModPackets;
+import com.test.eraser.utils.InventorySpecialItemsHolder;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -13,7 +14,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
-import static com.test.eraser.utils.Deets.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.test.eraser.utils.Deets.IRONS_SPELLBOOKS;
+import static com.test.eraser.utils.Deets.require;
 
 @SuppressWarnings("removal")
 @Mod(Eraser.MODID)
@@ -42,6 +48,9 @@ public class Eraser {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        List<Item> modItems = ModItems.getAllItems();
+        Set<Item> itemSet = new HashSet<>(modItems);
+        InventorySpecialItemsHolder.setSpecialItems(itemSet);
         ModPackets.register();
     }
 

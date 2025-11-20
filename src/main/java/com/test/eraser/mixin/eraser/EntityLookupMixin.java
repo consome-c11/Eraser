@@ -1,6 +1,5 @@
 package com.test.eraser.mixin.eraser;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.utils.EraseEntityLookupBridge;
@@ -15,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -72,7 +69,8 @@ public abstract class EntityLookupMixin<T extends EntityAccess>
 
     @Inject(method = "remove", at = @At("RETURN"))
     public void onremove(T entity, CallbackInfo ci) {
-        if (entity == null || byId2 == null || byUuid2 == null) return;
+        if (entity == null || byId2 == null || byUuid2 == null) {
+        }
 
         /*this.byUuid2.remove(entity.getUUID());
         this.byId2.remove(entity.getId());*/
@@ -127,7 +125,7 @@ public abstract class EntityLookupMixin<T extends EntityAccess>
 
     @Inject(method = "count", at = @At("RETURN"), cancellable = true)
     public void Count(CallbackInfoReturnable<Integer> cir) {
-        if(byId2 == null || byUuid2 == null) return;
+        if (byId2 == null || byUuid2 == null) return;
         int extra = 0;
         for (T t : this.byUuid2.values()) {
             if (t instanceof ILivingEntity) {
@@ -138,6 +136,7 @@ public abstract class EntityLookupMixin<T extends EntityAccess>
             cir.setReturnValue(!this.byUuid2.isEmpty() ? (extra + cir.getReturnValueI()) : cir.getReturnValueI());
         }
     }
+
     @Inject(
             method = {"<init>"},
             at = {@At("RETURN")}

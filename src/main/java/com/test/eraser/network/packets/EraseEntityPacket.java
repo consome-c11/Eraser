@@ -1,28 +1,14 @@
 package com.test.eraser.network.packets;
 
-import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.network.ClientPacketHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class EraseEntityPacket {
-    public final UUID entityUuid;
-    public final boolean skipAnimation;
-
-    public EraseEntityPacket(UUID entityUuid, boolean skipAnimation) {
-        this.entityUuid = entityUuid;
-        this.skipAnimation = skipAnimation;
-    }
+public record EraseEntityPacket(UUID entityUuid, boolean skipAnimation) {
 
     public static void encode(EraseEntityPacket msg, FriendlyByteBuf buf) {
         buf.writeUUID(msg.entityUuid);
