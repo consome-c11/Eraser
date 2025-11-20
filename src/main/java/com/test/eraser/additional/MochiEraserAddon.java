@@ -13,7 +13,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import com.mochi_753.eraser.register.EraserTabs;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
-@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+/*@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MochiEraserAddon {
 
     @SubscribeEvent
@@ -27,4 +27,4 @@ public class MochiEraserAddon {
             event.accept(ModItems.ERASER_ERASER.get());
         }
     }
-}
+}*/

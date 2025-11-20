@@ -2,28 +2,23 @@ package com.test.eraser.mixin.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModItems;
-import com.test.eraser.utils.TintingVertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.RegistryObject;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,15 +26,31 @@ import java.util.stream.Collectors;
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
 
+    @Unique
     private static final List<RegistryObject<Item>> AFFECTED_ITEMS = List.of(
             ModItems.SNACK_HELMET,
             ModItems.SNACK_CHESTPLATE,
             ModItems.SNACK_LEGGINGS,
             ModItems.SNACK_BOOTS,
-            ModItems.NULL_INGOT,
-            ModItems.ERASER_ERASER
+            ModItems.NULL_INGOT
     );
 
+    @Unique
+    private static List<String> AFFECTED_ITEM_IDS = List.of(
+            "eraser:eraser_eraser"
+    );
+
+    @Unique
+    public List<String> getAffectedItemIds() {
+        return AFFECTED_ITEM_IDS;
+    }
+
+    @Unique
+    public boolean add_toAffectedItemIds(String id) {
+        return AFFECTED_ITEM_IDS.add(id);
+    }
+
+    @Unique
     private static List<Item> getAffectedItems() {
         return AFFECTED_ITEMS.stream()
                 .filter(RegistryObject::isPresent)
@@ -47,6 +58,7 @@ public abstract class ItemRendererMixin {
                 .collect(Collectors.toList());
     }
 
+    @Unique
     private static boolean shouldAffect(ItemStack stack, ItemDisplayContext ctx) {
         boolean inHand =
                 ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ||
@@ -55,14 +67,15 @@ public abstract class ItemRendererMixin {
                         ctx == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
 
         boolean inGui = ctx == ItemDisplayContext.GUI;
-
+        String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
         List<Item> currentAffectedItems = getAffectedItems();
         return (inHand || inGui) && (
                 ModItems.getAllItems().stream().anyMatch(stack::is) ||
-                        currentAffectedItems.stream().anyMatch(stack::is)
+                        currentAffectedItems.stream().anyMatch(stack::is) || AFFECTED_ITEM_IDS.contains(itemId)
         );
     }
 
+    @Unique
     private static boolean isHeldContext(ItemDisplayContext ctx) {
         return ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND
                 || ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
@@ -70,22 +83,7 @@ public abstract class ItemRendererMixin {
                 || ctx == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
     }
 
-    private static boolean shouldRotate(ItemStack stack, ItemDisplayContext ctx) {
-        boolean inHand =
-                ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ||
-                        ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND ||
-                        ctx == ItemDisplayContext.THIRD_PERSON_LEFT_HAND ||
-                        ctx == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
-
-        boolean inGui = ctx == ItemDisplayContext.GUI;
-
-        List<Item> currentAffectedItems = getAffectedItems();
-        return (inHand || inGui) && (
-                ModItems.getAllItems().stream().anyMatch(stack::is) ||
-                        currentAffectedItems.stream().anyMatch(stack::is)
-        );
-    }
-
+    @Unique
     private static int waveGrayWhiteColor(long time, int index, double speed) {
         double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
         int gray = 0xCCCCCC;
@@ -142,10 +140,16 @@ public abstract class ItemRendererMixin {
         }
     }*/
 
+    @Unique
     private static DynamicTexture dynTex = null;
+
+    @Unique
     private static ResourceLocation dynLoc = null;
+
+    @Unique
     private static NativeImage img = null;
 
+    @Unique
     private static void initTexture() {
         if (dynTex == null) {
             img = new NativeImage(16, 16, true); // 16x16 RGBA?
@@ -158,7 +162,7 @@ public abstract class ItemRendererMixin {
     private void eraser$rotateInGui(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                     PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                     int packedOverlay, BakedModel model, CallbackInfo ci) {
-        if (context == ItemDisplayContext.GUI && shouldRotate(stack, context)) {
+        if (context == ItemDisplayContext.GUI && shouldAffect(stack, context)) {
             long time = System.currentTimeMillis();
             float angle = (float) (Math.sin(time / 500.0) * 0.4);
 
@@ -173,7 +177,7 @@ public abstract class ItemRendererMixin {
     private void eraser$popGui(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                int packedOverlay, BakedModel model, CallbackInfo ci) {
-        if (context == ItemDisplayContext.GUI && shouldRotate(stack, context)) {
+        if (context == ItemDisplayContext.GUI && shouldAffect(stack, context)) {
             poseStack.popPose();
         }
     }
@@ -182,7 +186,7 @@ public abstract class ItemRendererMixin {
     private void eraser$rotateHeld(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                    PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                    int packedOverlay, BakedModel model, CallbackInfo ci) {
-        if (isHeldContext(context) && shouldRotate(stack, context)) {
+        if (isHeldContext(context) && shouldAffect(stack, context)) {
             long time = System.currentTimeMillis();
             float angle = (float) (Math.sin(time / 500.0) * 10.0);
 
@@ -195,7 +199,7 @@ public abstract class ItemRendererMixin {
     private void eraser$popHeld(ItemStack stack, ItemDisplayContext context, boolean leftHand,
                                 PoseStack poseStack, MultiBufferSource buffer, int packedLight,
                                 int packedOverlay, BakedModel model, CallbackInfo ci) {
-        if (isHeldContext(context) && shouldRotate(stack, context)) {
+        if (isHeldContext(context) && shouldAffect(stack, context)) {
             poseStack.popPose();
         }
     }

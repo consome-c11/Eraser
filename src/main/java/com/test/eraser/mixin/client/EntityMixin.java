@@ -1,0 +1,45 @@
+package com.test.eraser.mixin.client;
+
+import com.test.eraser.additional.ModItems;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+@Mixin(value = Entity.class)
+@OnlyIn(Dist.CLIENT)
+public class EntityMixin {
+
+    @Inject(method = "isCurrentlyGlowing", at = @At("HEAD"), cancellable = true)
+    private void onIsCurrentlyGlowing(CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = (Entity) (Object) this;
+        if(!(entity instanceof LivingEntity)) return;
+        Player localPlayer = Minecraft.getInstance().player;
+        if (localPlayer != null) {
+
+            if (localPlayer.isShiftKeyDown() && localPlayer.getMainHandItem().getItem() == ModItems.ERASER_ITEM.get() && entity != localPlayer) {
+                double radius = 10.0;
+                AABB area = localPlayer.getBoundingBox().inflate(radius);
+
+                Vec3 entityCenterPos = entity.getEyePosition();
+
+                if (area.contains(entityCenterPos)) {
+                    if (entity instanceof LivingEntity && entity != localPlayer) {
+                        cir.setReturnValue(true);
+                    }
+
+                }
+            }
+        }
+    }
+}
+

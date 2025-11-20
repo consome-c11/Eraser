@@ -17,6 +17,7 @@
     "client.LivingEntityMixin",
     "client.LevelMixin",
     "client.BossHelthOverlayAccessor",
+    "client.EntityMixin",
     "snackprotector.GameRendererMixin"
   ],
   "mixins": [

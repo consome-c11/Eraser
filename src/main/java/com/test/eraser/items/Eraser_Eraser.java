@@ -29,7 +29,7 @@ import java.util.Properties;
 
 import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
 
-public class Eraser_Eraser extends Item {
+/*public class Eraser_Eraser extends Item {
     public Eraser_Eraser(Properties props) {
         super(props);
     }
@@ -113,4 +113,4 @@ public class Eraser_Eraser extends Item {
         level.playSound(null, target.blockPosition(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS,
                 1.0F, 1.0F);
     }
-}
+}*/

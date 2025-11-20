@@ -42,8 +42,8 @@ public class ModItems {
     public static final RegistryObject<Item> CANTEEN_ITEM =
             ITEMS.register("ultimate_canteen", () -> new UltimaCanteen(new Item.Properties().stacksTo(1)));
 
-    public static final RegistryObject<Item> ERASER_ERASER =
-            ADDON_ITEMS.register("eraser_eraser", () -> new Eraser_Eraser(new Item.Properties().stacksTo(1)));
+    /*public static final RegistryObject<Item> ERASER_ERASER =// thanks @mochi_753 :)
+            ADDON_ITEMS.register("eraser_eraser", () -> new Eraser_Eraser(new Item.Properties().stacksTo(1)));*/
 
     public static List<Item> getAllItems() {
         return ITEMS.getEntries().stream()

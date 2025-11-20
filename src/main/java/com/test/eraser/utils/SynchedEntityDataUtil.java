@@ -13,7 +13,7 @@ public class SynchedEntityDataUtil {
 
         if (!Objects.equals(item.getValue(), value)) {
             item.setValue(value);
-            acc.getEntity().onSyncedDataUpdated(accessor);
+            //acc.getEntity().onSyncedDataUpdated(accessor);
             item.setDirty(true);
             acc.setDirtyFlag(true);
         }

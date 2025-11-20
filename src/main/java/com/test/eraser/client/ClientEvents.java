@@ -1,36 +1,28 @@
 package com.test.eraser.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
-import com.test.eraser.client.renderer.ShieldEffectRenderer;
-import com.test.eraser.items.Eraser_Item;
 import com.test.eraser.logic.ILivingEntity;
-import com.test.eraser.mixin.client.BossHelthOverlayAccessor;
 import com.test.eraser.network.packets.DestroyBlockPacket;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import com.test.eraser.utils.DestroyMode;
-import com.test.eraser.utils.RenderUtils;
 import com.test.eraser.utils.Res;
-import com.test.eraser.utils.WorldDestroyerUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.BossHealthOverlay;
-import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -39,14 +31,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.accesstransformer.INameHandler;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
@@ -94,22 +82,19 @@ public class ClientEvents {
         erase();
         ItemStack stack = mc.player.getMainHandItem();
         if (stack.getItem() == ModItems.ERASER_ITEM.get()) {
-            if (mc.player.isShiftKeyDown()) {
+            if (mc.options.keyShift.isDown()) {
                 double radius = 10.0;
                 AABB area = mc.player.getBoundingBox().inflate(radius);
 
-                List<LivingEntity> targets = mc.level.getEntitiesOfClass(
+                List<LivingEntity> targets = mc.player.level().getEntitiesOfClass(
                         LivingEntity.class,
                         area,
                         e -> e != mc.player
                 );
-
+                //if(targets.isEmpty()) return;
                 for (LivingEntity target : targets) {
-                    target.setGlowingTag(true);
-                }
-            } else {
-                for (Entity e : mc.level.entitiesForRendering()) {
-                    e.setGlowingTag(false);
+                    //((Entity)target).setGlowingTag(true);
+                    System.out.println("Target: " + target.isCurrentlyGlowing());
                 }
             }
         }
@@ -300,7 +285,6 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
             Minecraft mc = Minecraft.getInstance();
@@ -314,6 +298,9 @@ public class ClientEvents {
             renderBlockList(event.getPoseStack(), event.getCamera().getPosition(), RenderQueue.getPositions(), 0xFFFFFFFF);
 
             //RenderQueue.clear();
+
+            ItemStack stack = mc.player.getMainHandItem();
+
         }
     }
 
