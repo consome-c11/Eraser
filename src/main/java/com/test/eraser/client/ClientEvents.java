@@ -230,8 +230,8 @@ public class ClientEvents {
     public static void onRenderLiving(RenderLivingEvent.Pre<LivingEntity, ?> event) {
         LivingEntity entity = event.getEntity();
         UUID uuid = entity.getUUID();
-        entity.setDeltaMovement(new Vec3(0, 0, 0));
         if (entity instanceof ILivingEntity living && living.isErased()) {
+            entity.setDeltaMovement(new Vec3(0, 0, 0));
             long now = System.currentTimeMillis();
             long last = lastUpdate.getOrDefault(uuid, 0L);
             if (now - last >= 50) {//1tick?
