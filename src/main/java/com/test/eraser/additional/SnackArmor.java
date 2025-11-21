@@ -2,6 +2,7 @@ package com.test.eraser.additional;
 
 import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -113,7 +114,7 @@ public class SnackArmor {
         @SubscribeEvent
         public static void onEquipmentChange(LivingEquipmentChangeEvent event) {
             if (!(event.getEntity() instanceof Player player)) return;
-            if (player instanceof ILivingEntity Iliving) if (Iliving.wasFullset()) resetAbilities(player);
+            if (player instanceof ILivingEntity Iliving) if (Iliving.wasFullset() && !isFullSet(player)) resetAbilities(player);
 
         }
 
@@ -121,11 +122,13 @@ public class SnackArmor {
         public static void onLivingTick(LivingEvent.LivingTickEvent event) {
             if (!(event.getEntity() instanceof Player player)) return;
 
-            if (isFullSet(player)) applyAbilities(player);
+            if (isFullSet(player)) {
+                applyAbilities(player);
+            }
 
         }
 
-        @SubscribeEvent
+        /*@SubscribeEvent
         public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
             Player player = event.getEntity();
             if (!player.level().isClientSide && isFullSet(player)) {
@@ -147,7 +150,7 @@ public class SnackArmor {
             if (!player.level().isClientSide && isFullSet(player)) {
                 applyAbilities(player);
             }
-        }
+        }*/
 
         /*@SubscribeEvent
         public static void onProjectileImpact(ProjectileImpactEvent event) {
@@ -167,20 +170,33 @@ public class SnackArmor {
         }*/
 
         private static void applyAbilities(Player player) {
-            if (player.getAbilities().mayfly && player.getAbilities().invulnerable) return;
-            player.getAbilities().mayfly = true;
-            if (!player.onGround()) player.getAbilities().flying = true;
-            player.getAbilities().invulnerable = true;
-            player.onUpdateAbilities();
+
+            //player.getAbilities().invulnerable = true;
+            if (!player.getAbilities().mayfly) {
+                player.getAbilities().mayfly = true;
+                if (!player.onGround()) player.getAbilities().flying = true;
+                player.onUpdateAbilities();
+            }
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(20.0F);
+            player.clearFire();
+            removeSpecificEffects(player);
             //player.setHealth(player.getMaxHealth());
             if (player instanceof ILivingEntity Iliving) Iliving.setwasFullset(true);
         }
 
+        private static void removeSpecificEffects(Player player) {
+
+            player.removeEffect(MobEffects.CONFUSION);
+            player.removeEffect(MobEffects.BLINDNESS);
+            player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+            player.removeEffect(MobEffects.WEAKNESS);
+            player.removeEffect(MobEffects.DIG_SLOWDOWN);
+        }
+
         private static void resetAbilities(Player player) {
             player.getAbilities().mayfly = false;
-            player.getAbilities().invulnerable = false;
+            //player.getAbilities().invulnerable = false;
             player.onUpdateAbilities();
             if (player instanceof ILivingEntity Iliving) Iliving.setwasFullset(false);
         }
@@ -190,7 +206,7 @@ public class SnackArmor {
             if (!(event.getNewTarget() instanceof Player player)) return;
 
             if (SnackProtector.isFullSet(player)) {
-                event.setCanceled(true);
+                //event.setCanceled(true);
             }
         }
 

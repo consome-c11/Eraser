@@ -46,6 +46,8 @@
     "snackprotector.SynchedEntityDataMixin",
     "snackprotector.SynchedEntityDataItemMixin",
     "snackprotector.ServerPlayerMixin",
+    "snackprotector.InventoryAccessor",
+    "snackprotector.InventoryMixin",
     "world_destroyer.ServerLevelMixin",
     "world_destroyer.LevelChunkMixin",
     "world_destroyer.LevelChunkAccessor",
