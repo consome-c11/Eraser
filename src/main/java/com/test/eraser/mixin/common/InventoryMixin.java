@@ -34,10 +34,8 @@ public class InventoryMixin {
     @Inject(method = "dropAll", at = @At("HEAD"), cancellable = true)
     private void onDropAll(CallbackInfo callbackInfo) {
         if (hasSpecialItemInInventory()) {
-            if (player.isDeadOrDying() || ((ILivingEntity) player).isErased()) {
-                Chenged_dropAll();
-                callbackInfo.cancel();
-            }
+            Chenged_dropAll();
+            callbackInfo.cancel();
         }
     }
 

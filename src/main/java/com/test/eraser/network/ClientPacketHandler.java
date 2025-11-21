@@ -30,7 +30,7 @@ public class ClientPacketHandler {
 
             if (((LivingEntity)e) instanceof ILivingEntity erased) {
                 //LOGGER.info("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
-                //erased.setErased(true);
+                erased.setErased(true);
                 erased.markErased(e.getUUID());
 
                 if(!(e instanceof Player)) {

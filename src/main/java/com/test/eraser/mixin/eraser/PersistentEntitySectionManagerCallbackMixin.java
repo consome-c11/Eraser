@@ -8,9 +8,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("remapping")
 @Mixin(targets = "net.minecraft.world.level.entity.PersistentEntitySectionManager$Callback")
 public abstract class PersistentEntitySectionManagerCallbackMixin {
-    @Shadow
+    @Shadow(remap = false)
     private Entity realEntity;
 
     @Inject(method = "onMove", at = @At("HEAD"), cancellable = true, remap = true)

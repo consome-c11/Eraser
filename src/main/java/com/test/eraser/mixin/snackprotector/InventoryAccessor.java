@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+import java.util.List;
+
 @Mixin(Inventory.class)
 public interface InventoryAccessor {
     @Mutable
@@ -29,4 +31,11 @@ public interface InventoryAccessor {
 
     @Accessor("offhand")
     NonNullList<ItemStack> getOffhand();
+
+    @Mutable
+    @Accessor("compartments")
+    void setCompartments(List<NonNullList<ItemStack>> compartments);
+
+    @Accessor("compartments")
+    List<NonNullList<ItemStack>> getCompartments();
 }

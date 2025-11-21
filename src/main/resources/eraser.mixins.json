@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.test.eraser.mixin",
+  "plugin": "com.llamalad7.mixinextras.MixinExtrasBootstrap",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "refmap": "eraser.refmap.json",
@@ -48,6 +49,7 @@
     "snackprotector.ServerPlayerMixin",
     "snackprotector.InventoryAccessor",
     "snackprotector.InventoryMixin",
+    "snackprotector.PlayerListMixin",
     "world_destroyer.ServerLevelMixin",
     "world_destroyer.LevelChunkMixin",
     "world_destroyer.LevelChunkAccessor",

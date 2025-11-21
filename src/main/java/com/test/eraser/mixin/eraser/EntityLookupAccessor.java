@@ -17,7 +17,6 @@ public interface EntityLookupAccessor<T extends EntityAccess> {
     @Accessor("byId")
     Int2ObjectMap<T> getById();
 
-    @Shadow
     @Mutable
     @Final
     @Accessor("byId")
@@ -26,7 +25,6 @@ public interface EntityLookupAccessor<T extends EntityAccess> {
     @Accessor("byUuid")
     Map<UUID, T> getByUuid();
 
-    @Shadow
     @Mutable
     @Final
     @Accessor("byUuid")

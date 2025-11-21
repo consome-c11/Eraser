@@ -16,16 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = LivingEntity.class, priority = 0)
 public abstract class LivingEntityMixin {
-    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
-    private void snackProtector$cancelHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        if (self instanceof Player player && SnackArmor.SnackProtector.isFullSet(player)) {
-            cir.cancel();
-        }//event living entityevent = attackhandler
-    }
 
-    @Inject(method = "setHealth", at = @At("HEAD"), cancellable = true)
-    private void snackProtector$canselsetHealth(float hp, CallbackInfo cir) {
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    private void snackProtector$hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (self instanceof Player player && SnackArmor.SnackProtector.isFullSet(player)) {
             cir.cancel();

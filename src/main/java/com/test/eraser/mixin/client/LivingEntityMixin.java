@@ -10,11 +10,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.TransientEntitySectionManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,19 +31,23 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     public void eraseClientEntity() {
         LivingEntity self = (LivingEntity) (Object) this;
         ((ILivingEntity) self).setErased(false);
+        ((ILivingEntity) self).unmarkErased(self.getUUID());
         Minecraft mc = Minecraft.getInstance();
         ClientLevel clientLevel = mc.level;
-        TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
+        self.setPose(Pose.DYING);
+        self.deathTime = 1;
+        if(self == mc.player) return;
+        /*TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
+        self.onClientRemoval();*/
 
-        self.onClientRemoval();
         ((EntityAccessor) (self)).setRemovalReason(Entity.RemovalReason.KILLED);
         //removeFromOtherIndexes(self.getUUID(), clientLevel, tManager);
         clientLevel.removeEntity(self.getId(), Entity.RemovalReason.KILLED);
         //self.remove(Entity.RemovalReason.KILLED);
         self.invalidateCaps();
         Entity e = clientLevel.getEntity(self.getId());
-        List<Entity> snapshot = StreamSupport.stream(((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities().getAllEntities().spliterator(), false)
-                .collect(Collectors.toList());
+        /*List<Entity> snapshot = StreamSupport.stream(((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities().getAllEntities().spliterator(), false)
+                .collect(Collectors.toList());*/
         if (self instanceof Player) PacketHandler.CHANNEL.sendToServer(new HandleErasePacket());
 
         if (e != null) {
@@ -54,5 +62,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    private void eraser$shrinkAABBOnTick(CallbackInfo ci) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (this.isErased()) {
+            //self.setBoundingBox(new AABB(self.getX(), self.getY(), self.getZ(), self.getX(), self.getY(), self.getZ()));
+            ci.cancel();
+            self.deathTime ++;
+        }
+    }
 }

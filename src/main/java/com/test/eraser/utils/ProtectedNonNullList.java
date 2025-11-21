@@ -30,16 +30,29 @@ public class ProtectedNonNullList extends NonNullList<ItemStack> {
         return this.editingAllowed;
     }
 
-    private boolean isProtectionActive() {
-        if (isLoadContext || !SnackArmor.SnackProtector.isFullSet(player)) {
-            return true;
+    public boolean isProtectionActive() {
+        return (!this.editingAllowed || !isLoadContext) && SnackArmor.SnackProtector.isFullSet(player) && !isCalledFromGui();
+    }
+
+    private boolean isCalledFromGui() {
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stack) {
+            String className = element.getClassName();
+            System.out.println("Class: " + className);
+            if (className.contains("Container") || //AbstractContainerMenu
+                    className.contains("Slot") ||
+                    className.contains("ProtectedNonNullList") ||
+                    className.contains("Menu") ||
+                    className.contains("inventory")) {
+                return true;
+            }
         }
-        return this.editingAllowed;
+        return false;
     }
 
     @Override
     public ItemStack set(int index, ItemStack element) {
-        if (isProtectionActive()) {
+        if (!isProtectionActive()) {
             return super.set(index, element);
         }
         return this.get(index);
@@ -47,7 +60,7 @@ public class ProtectedNonNullList extends NonNullList<ItemStack> {
 
     @Override
     public void clear() {
-        if (isProtectionActive()) {
+        if (isLoadContext) {
             super.clear();
         }
     }

@@ -110,7 +110,7 @@ public class ServerEvents {
     public void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ILivingEntity living) {
             living.setErased(false);
-            living.markErased(event.getEntity().getUUID());
+            living.unmarkErased(event.getEntity().getUUID());
         }
     }
 

@@ -14,8 +14,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "net.minecraft.network.syncher.SynchedEntityData$DataItem")
+@Mixin(SynchedEntityData.DataItem.class)
 public abstract class SynchedEntityDataItemMixin<T> {
     @Shadow public abstract EntityDataAccessor<T> getAccessor();
     @Shadow private T value;
@@ -37,10 +38,35 @@ public abstract class SynchedEntityDataItemMixin<T> {
         }
     }
 
-    @Inject(method = "setValue", at = @At("HEAD"))
-    private void captureOldValue(T newValue, CallbackInfo ci) {
+    @Inject(method = "setValue", at = @At("HEAD"), cancellable = true)
+    private void captureOldValueAndProtect(T newValue, CallbackInfo ci) {
         if (getAccessor() == HEALTH_ID) {
-            this.oldValue = this.value;
+
+            SynchedEntityData synchedData = getOuterSynchedData();
+            if (synchedData == null) {
+                return;
+            }
+
+            Entity entity = ((SynchedEntityDataAccessor) synchedData).getEntity();
+            if (entity == null || entity.level().isClientSide) {
+                return;
+            }
+
+            if (!(entity instanceof LivingEntity living) || !(living instanceof Player player)) {
+                return;
+            }
+
+            if (!SnackArmor.SnackProtector.isFullSet(player)) {
+                return;
+            }
+
+            if (oldValue instanceof Float oldHealth && newValue instanceof Float newHealth) {
+                if (newHealth <= oldHealth) {
+                    ci.cancel();
+                    this.value = oldValue;
+                }
+                else this.oldValue = this.value;
+            }
         }
     }
 
@@ -73,6 +99,56 @@ public abstract class SynchedEntityDataItemMixin<T> {
                 this.value = oldValue;
                 ci.cancel();
             }
+
         }
     }
+
+    @Inject(method = "isDirty", at = @At("HEAD"), cancellable = true)
+    private void snackProtector$isDirty(CallbackInfoReturnable<Boolean> cir) {
+        if (getAccessor() != HEALTH_ID || oldValue == null) {
+            return;
+        }
+        SynchedEntityData synchedData = getOuterSynchedData();
+        if (synchedData == null) {
+            return;
+        }
+
+        Entity entity = ((SynchedEntityDataAccessor) synchedData).getEntity();
+        if (entity == null || entity.level().isClientSide) {
+            return;
+        }
+        if (!(entity instanceof LivingEntity living) || !(living instanceof Player player) || !SnackArmor.SnackProtector.isFullSet(player)) {
+            return;
+        }
+        cir.setReturnValue(false);
+    }
+
+    @Inject(method = "value", at = @At("HEAD"), cancellable = true)//idk
+    private void protectValueForWrite(CallbackInfoReturnable<SynchedEntityData.DataValue<T>> cir) {
+        if (getAccessor() != HEALTH_ID || oldValue == null) {
+            return;
+        }
+
+        SynchedEntityData synchedData = getOuterSynchedData();
+        if (synchedData == null) {
+            return;
+        }
+
+        Entity entity = ((SynchedEntityDataAccessor) synchedData).getEntity();
+        if (entity == null || entity.level().isClientSide) {
+            return;
+        }
+
+        if (!(entity instanceof LivingEntity living) || !(living instanceof Player player)) {
+            return;
+        }
+
+        if (!SnackArmor.SnackProtector.isFullSet(player)) {
+            return;
+        }
+        SynchedEntityData.DataValue<T> safeDataValue = SynchedEntityData.DataValue.create(getAccessor(), oldValue);
+        cir.cancel();
+        cir.setReturnValue(safeDataValue);
+    }
+
 }
