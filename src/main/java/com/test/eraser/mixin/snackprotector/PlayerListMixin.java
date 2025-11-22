@@ -13,7 +13,7 @@ public class PlayerListMixin {
 
     @Inject(method = "respawn", at = @At("HEAD"), cancellable = true)
     private void onrespawn(ServerPlayer player, boolean keepinventory, CallbackInfoReturnable<ServerPlayer> cir) {
-        if (SnackArmor.SnackProtector.isFullSet(player)) {
+        if (SnackArmor.SnackProtector.isFullSet(player) && player.isAlive() && !player.isRemoved()) {
             cir.cancel();
             cir.setReturnValue(player);//アホやらかした 何故自分はあんなにも頭が悪いのだろうか。
             //@test ちゃんとMixinするときは元関数読めよ!

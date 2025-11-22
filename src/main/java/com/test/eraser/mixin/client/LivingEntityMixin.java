@@ -30,13 +30,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void eraseClientEntity() {
         LivingEntity self = (LivingEntity) (Object) this;
-        ((ILivingEntity) self).setErased(false);
-        ((ILivingEntity) self).unmarkErased(self.getUUID());
         Minecraft mc = Minecraft.getInstance();
+        if(self == mc.player) return;
+        //((ILivingEntity) self).setErased(false);
+        //((ILivingEntity) self).unmarkErased(self.getUUID());
         ClientLevel clientLevel = mc.level;
         self.setPose(Pose.DYING);
         self.deathTime = 1;
-        if(self == mc.player) return;
         /*TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
         self.onClientRemoval();*/
 
@@ -62,7 +62,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void eraser$shrinkAABBOnTick(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (this.isErased()) {
@@ -70,5 +70,5 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             ci.cancel();
             self.deathTime ++;
         }
-    }
+    }*/
 }

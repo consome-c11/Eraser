@@ -121,7 +121,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             ((LivingEntityAccessor) self).setLastHurtByMob(attacker);
             ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
             self.getCombatTracker().recordDamage(eraseSrc, 0);
-            ((LivingEntityAccessor) self).callDie(eraseSrc);
+            //((LivingEntityAccessor) self).callDie(eraseSrc);
         } else if (Config.FORCE_DIE.get()) {
             EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
             //self.hurt(eraseSrc,Float.MAX_VALUE);

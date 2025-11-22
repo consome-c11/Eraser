@@ -24,7 +24,6 @@
     "eraser.LivingEntityMixin",
     "eraser.EntityMixin",
     "eraser.ForgeHooksMixin",
-    "eraser.ForgeEventFactoryMixin",
     "eraser.PersistentEntitySectionManagerAccessor",
     "eraser.ServerLevelAccessor",
     "eraser.ClassInstanceMultiMapAccessor",

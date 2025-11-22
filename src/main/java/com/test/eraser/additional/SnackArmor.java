@@ -1,6 +1,9 @@
 package com.test.eraser.additional;
 
 import com.test.eraser.logic.ILivingEntity;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -113,9 +116,28 @@ public class SnackArmor {
 
         @SubscribeEvent
         public static void onEquipmentChange(LivingEquipmentChangeEvent event) {
-            if (!(event.getEntity() instanceof Player player)) return;
-            if (player instanceof ILivingEntity Iliving) if (Iliving.wasFullset() && !isFullSet(player)) resetAbilities(player);
+            if (!(event.getEntity() instanceof Player player) || player.level().isClientSide) return;
+            if(player instanceof ILivingEntity Iliving) {
+                if (Iliving.wasFullset() && !isFullSet(player)) {
+                    player.getServer().getPlayerList().getPlayers().forEach(otherPlayer -> {
+                        if (otherPlayer != player) {
+                            otherPlayer.connection.send(new ClientboundAddEntityPacket(player));
+                        }
+                    });
+                    resetAbilities(player);
+                } else if(!Iliving.wasFullset() && isFullSet(player)) {
+                    sendRemove((ServerPlayer)player);
+                }
+            }
+        }
 
+        static void sendRemove(ServerPlayer player) {
+            if (player == null) return;
+            player.getServer().getPlayerList().getPlayers().forEach(otherPlayer -> {
+                if (otherPlayer != player) {
+                    otherPlayer.connection.send(new ClientboundRemoveEntitiesPacket(player.getId()));
+                }
+            });
         }
 
         @SubscribeEvent
@@ -128,11 +150,11 @@ public class SnackArmor {
 
         }
 
-        /*@SubscribeEvent
+        @SubscribeEvent
         public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
             Player player = event.getEntity();
             if (!player.level().isClientSide && isFullSet(player)) {
-                applyAbilities(player);
+                sendRemove((ServerPlayer)player);
             }
         }
 
@@ -140,7 +162,7 @@ public class SnackArmor {
         public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
             Player player = event.getEntity();
             if (!player.level().isClientSide && isFullSet(player)) {
-                applyAbilities(player);
+                sendRemove((ServerPlayer)player);
             }
         }
 
@@ -148,9 +170,9 @@ public class SnackArmor {
         public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
             Player player = event.getEntity();
             if (!player.level().isClientSide && isFullSet(player)) {
-                applyAbilities(player);
+                sendRemove((ServerPlayer)player);
             }
-        }*/
+        }
 
         /*@SubscribeEvent
         public static void onProjectileImpact(ProjectileImpactEvent event) {

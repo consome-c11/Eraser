@@ -226,11 +226,11 @@ public class ClientEvents {
         return Minecraft.getInstance().screen == null;
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void onRenderLiving(RenderLivingEvent.Pre<LivingEntity, ?> event) {
         LivingEntity entity = event.getEntity();
         UUID uuid = entity.getUUID();
-        if (entity instanceof ILivingEntity living && living.isErased()) {
+        if (entity instanceof ILivingEntity living && living.isErased(entity.getUUID())) {
             entity.setDeltaMovement(new Vec3(0, 0, 0));
             long now = System.currentTimeMillis();
             long last = lastUpdate.getOrDefault(uuid, 0L);
@@ -239,9 +239,9 @@ public class ClientEvents {
                 entity.setPose(Pose.DYING);
                 lastUpdate.put(uuid, now);
             }
-            if (entity.deathTime > 20) event.setCanceled(true);
+            //if (entity.deathTime > 20) event.setCanceled(true);
         }
-    }
+    }*/
 
     public static boolean erase() {
         Minecraft mc = Minecraft.getInstance();

@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
     public static void handleEraseEntity(EraseEntityPacket msg) {
@@ -29,8 +31,8 @@ public class ClientPacketHandler {
             }
 
             if (((LivingEntity)e) instanceof ILivingEntity erased) {
-                //LOGGER.info("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
-                erased.setErased(true);
+                //LOGGER.info("[Eraser] Received EraseEntityPacket for: " + e.getName().getString());
+                //erased.setErased(true);
                 erased.markErased(e.getUUID());
 
                 if(!(e instanceof Player)) {
