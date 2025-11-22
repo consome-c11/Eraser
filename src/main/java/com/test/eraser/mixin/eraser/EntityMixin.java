@@ -1,7 +1,7 @@
 package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.additional.ModDamageTypes;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -71,5 +71,6 @@ public class EntityMixin {
             cir.setReturnValue(-1);
         }
     }*/
+
 
 }

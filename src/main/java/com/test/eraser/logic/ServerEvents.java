@@ -5,6 +5,7 @@ import com.test.eraser.additional.ModDamageTypes;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.entity.HomingArrowEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

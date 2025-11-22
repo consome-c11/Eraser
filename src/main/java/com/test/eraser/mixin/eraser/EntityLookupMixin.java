@@ -1,7 +1,7 @@
 package com.test.eraser.mixin.eraser;
 
 import com.google.common.collect.Maps;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.utils.EraseEntityLookupBridge;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

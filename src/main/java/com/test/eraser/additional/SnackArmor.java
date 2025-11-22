@@ -1,6 +1,6 @@
 package com.test.eraser.additional;
 
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,6 +1,5 @@
 package com.test.eraser.mixin.common;
 
-import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.utils.InventorySpecialItemsHolder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;

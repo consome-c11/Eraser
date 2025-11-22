@@ -2,8 +2,7 @@ package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.Config;
 import com.test.eraser.additional.ModDamageSources;
-import com.test.eraser.additional.SnackArmor;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.EraseEntityPacket;
 import com.test.eraser.utils.EraseEntityLookupBridge;
@@ -11,20 +10,16 @@ import com.test.eraser.utils.SynchedEntityDataUtil;
 import com.test.eraser.utils.TaskScheduler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.SectionPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stats;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.*;
 import net.minecraftforge.network.PacketDistributor;
@@ -71,6 +66,19 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
+    @Unique
+    public boolean hardRemove(Object entity, ClassInstanceMultiMap<Entity> map) {
+        boolean flag = false;
+
+        for(Map.Entry<Class<?>, List<Entity>> entry : ((ClassInstanceMultiMapAccessor<Entity>) map).getByClass().entrySet()) {
+            if (entry.getKey().isInstance(entity)) {
+                List<Entity> list = entry.getValue();
+                flag |= list.remove(entity);
+            }
+        }
+
+        return flag;
+    }
     @Override
     public boolean isErased() {
         return this.erased;
@@ -242,7 +250,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                         ((EntitySectionAccessor<Entity>) section2).getStorage();
                 Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
                 hardRemove(self, byClass);
-                multiMap.remove(self);
+                hardRemove(self, multiMap);
                 if (debug)
                     System.out.println("[EraserMod] forceErase: removed entity id=" + self.getId() + " from LevelEntityGetter section storage");
             }
@@ -256,7 +264,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                 ClassInstanceMultiMap<Entity> multiMap = ((EntitySectionAccessor<Entity>) section).getStorage();
                 Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
                 hardRemove(self, byClass);
-                multiMap.remove(self);
+                hardRemove(self, multiMap);
             }
             ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
             Int2ObjectMap<?> entityMap = ((ChunkMapAccessor) chunkMap).getEntityMap();
@@ -360,6 +368,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             //ci.cancel();
         }
     }
+
+    /*@Inject(method = "baseTick", at = @At("HEAD"), cancellable = true)
+    private void eraser$baseTick(CallbackInfo ci) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (this.isErased()) {
+            ci.cancel();
+        }
+    }*/
 
     /*@Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true)
     private void eraser$tickDeath(CallbackInfo ci) {

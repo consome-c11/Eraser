@@ -1,6 +1,7 @@
 package com.test.eraser.items;
 
 import com.test.eraser.additional.ModTiers;
+import com.test.eraser.utils.ColorUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -23,17 +24,6 @@ public class World_Destroyer_Item extends PickaxeItem {
         super(ModTiers.WORLD_DESTROYER_TIER, 1, 3.F, props.stacksTo(1).fireResistant());
     }
 
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
-    }
-
     @Override
     public Component getName(ItemStack stack) {
         String text = Component.translatable("item.c11eraser.world_destroyer").getString();
@@ -41,7 +31,7 @@ public class World_Destroyer_Item extends PickaxeItem {
         long time = System.currentTimeMillis() / 50;
 
         for (int i = 0; i < text.length(); i++) {
-            int color = waveGrayWhiteColor(time, i, 5.0);
+            int color = ColorUtils.waveGrayWhiteColor(time, i, 5.0);
             result = result.append(Component.literal(String.valueOf(text.charAt(i)))
                     .withStyle(style -> style.withColor(color)));
         }
@@ -80,7 +70,7 @@ public class World_Destroyer_Item extends PickaxeItem {
         var waveLineNormal = Component.empty();
 
         for (int i = 0; i < parts.length; i++) {
-            int color = waveGrayWhiteColor(gameTime, i, 6.5);
+            int color = ColorUtils.waveGrayWhiteColor(gameTime, i, 6.5);
             waveLineNormal = waveLineNormal.append(
                     Component.literal(parts[i])
                             .withStyle(s -> s.withColor(color))
@@ -93,7 +83,7 @@ public class World_Destroyer_Item extends PickaxeItem {
         var waveLine2 = Component.empty();
         for (int i = 0; i < desc2.length(); i++) {
             char c = desc2.charAt(i);
-            int color = waveGrayWhiteColor(gameTime, i, 6.0);
+            int color = ColorUtils.waveGrayWhiteColor(gameTime, i, 6.0);
             waveLine2 = waveLine2.append(
                     Component.literal(String.valueOf(c))
                             .withStyle(s -> s.withColor(color))

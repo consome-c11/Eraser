@@ -3,7 +3,7 @@ package com.test.eraser.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.DestroyBlockPacket;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
@@ -23,7 +23,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -34,7 +33,6 @@ import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -93,7 +91,7 @@ public class ClientEvents {
                 //if(targets.isEmpty()) return;
                 for (LivingEntity target : targets) {
                     //((Entity)target).setGlowingTag(true);
-                    System.out.println("Target: " + target.isCurrentlyGlowing());
+                    //System.out.println("Target: " + target.isCurrentlyGlowing());
                 }
             }
         }

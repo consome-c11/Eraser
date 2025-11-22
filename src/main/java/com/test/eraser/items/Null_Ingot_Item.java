@@ -1,5 +1,6 @@
 package com.test.eraser.items;
 
+import com.test.eraser.utils.ColorUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,17 +15,6 @@ public class Null_Ingot_Item extends Item {
         super(props);
     }
 
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
-    }
-
     @Override
     public Component getName(ItemStack stack) {
         String text = "? Ingot";
@@ -32,7 +22,7 @@ public class Null_Ingot_Item extends Item {
         long time = System.currentTimeMillis() / 50;
 
         for (int i = 0; i < text.length(); i++) {
-            int color = waveGrayWhiteColor(time, i, 5.0);
+            int color = ColorUtils.waveGrayWhiteColor(time, i, 5.0);
             result = result.append(Component.literal(String.valueOf(text.charAt(i)))
                     .withStyle(style -> style.withColor(color)));
         }
@@ -47,7 +37,7 @@ public class Null_Ingot_Item extends Item {
         String[] parts = desc.split(" ");
         var waveLine = Component.empty();
         for (int i = 0; i < parts.length; i++) {
-            int color = waveGrayWhiteColor(gameTime, i, 6.5);
+            int color = ColorUtils.waveGrayWhiteColor(gameTime, i, 6.5);
             waveLine = waveLine.append(
                     Component.literal(parts[i])
                             .withStyle(s -> s.withColor(color))

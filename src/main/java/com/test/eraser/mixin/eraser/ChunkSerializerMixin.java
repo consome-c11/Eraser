@@ -1,7 +1,7 @@
 package com.test.eraser.mixin.eraser;
 
 import com.test.eraser.Config;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ClassInstanceMultiMap;

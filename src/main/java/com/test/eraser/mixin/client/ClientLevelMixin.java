@@ -1,6 +1,6 @@
 package com.test.eraser.mixin.client;
 
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;

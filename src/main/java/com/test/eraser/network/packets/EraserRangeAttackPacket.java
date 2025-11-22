@@ -1,6 +1,6 @@
 package com.test.eraser.network.packets;
 
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.utils.Eraser_Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

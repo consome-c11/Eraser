@@ -1,6 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;

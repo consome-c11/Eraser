@@ -1,6 +1,6 @@
 package com.test.eraser.mixin.world_destroyer;
 
-import com.test.eraser.logic.ILevelChunkSection;
+import com.test.eraser.utils.ILevelChunkSection;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.spongepowered.asm.mixin.Mixin;

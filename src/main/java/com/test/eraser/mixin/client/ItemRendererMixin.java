@@ -3,6 +3,7 @@ package com.test.eraser.mixin.client;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.test.eraser.additional.ModItems;
+import com.test.eraser.utils.ColorUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -79,18 +80,6 @@ public abstract class ItemRendererMixin {
                 || ctx == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
     }
 
-    @Unique
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xCCCCCC;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
-    }
-
     /*@Inject(method = "render", at = @At("HEAD"))
     private void eraser$injectDynamic(ItemStack stack, ItemDisplayContext ctx, boolean leftHand,
                                       PoseStack poseStack, MultiBufferSource buffer,
@@ -147,7 +136,7 @@ public abstract class ItemRendererMixin {
                                          CallbackInfo ci) {
         if (shouldAffect(stack, ctx)) {
             long time = System.currentTimeMillis();
-            int argb = waveGrayWhiteColor(time, 0, 700.0);
+            int argb = ColorUtils.waveGrayWhiteColor(time, 0, 700.0);
             float r = ((argb >> 16) & 0xFF) / 255f;
             float g = ((argb >> 8) & 0xFF) / 255f;
             float b = (argb & 0xFF) / 255f;

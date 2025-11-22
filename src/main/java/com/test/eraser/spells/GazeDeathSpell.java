@@ -1,7 +1,7 @@
 package com.test.eraser.spells;
 
 import com.test.eraser.Eraser;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.utils.Eraser_Utils;
 import com.test.eraser.utils.Res;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;

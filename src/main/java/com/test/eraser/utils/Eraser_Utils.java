@@ -1,6 +1,5 @@
 package com.test.eraser.utils;
 
-import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;

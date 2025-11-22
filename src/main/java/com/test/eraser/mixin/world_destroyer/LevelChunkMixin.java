@@ -1,7 +1,7 @@
 package com.test.eraser.mixin.world_destroyer;
 
-import com.test.eraser.logic.ILevelChunk;
-import com.test.eraser.logic.ILevelChunkSection;
+import com.test.eraser.utils.ILevelChunk;
+import com.test.eraser.utils.ILevelChunkSection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.EntityBlock;

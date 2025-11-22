@@ -2,6 +2,7 @@ package com.test.eraser.logic;
 
 import com.test.eraser.client.RenderQueue;
 import com.test.eraser.utils.DestroyMode;
+import com.test.eraser.utils.IServerLevel;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

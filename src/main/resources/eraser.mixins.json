@@ -18,6 +18,7 @@
     "client.LivingEntityMixin",
     "client.BossHelthOverlayAccessor",
     "client.EntityMixin",
+    "client.LevelRendererMixin",
     "snackprotector.GameRendererMixin"
   ],
   "mixins": [
@@ -31,6 +32,7 @@
     "eraser.LivingEntityAccessor",
     "eraser.SynchedEntityDataAccessor",
     "eraser.EntityTickListAccessor",
+    "eraser.EntityTickListMixin",
     "eraser.EntityLookupAccessor",
     "eraser.LevelEntityGetterAdapterAccessor",
     "eraser.EntityLookupMixin",

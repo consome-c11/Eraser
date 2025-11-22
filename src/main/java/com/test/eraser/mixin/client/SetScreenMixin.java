@@ -1,7 +1,7 @@
 package com.test.eraser.mixin.client;
 
 import com.test.eraser.additional.SnackArmor;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;

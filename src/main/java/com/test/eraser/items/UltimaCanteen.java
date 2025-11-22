@@ -4,6 +4,7 @@ import com.test.eraser.gui.BagMenu;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.SyncBagPagesPacket;
 import com.test.eraser.utils.BagSavedData;
+import com.test.eraser.utils.ColorUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -34,17 +35,6 @@ public class UltimaCanteen extends Item {
         super(props);
     }
 
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
-    }
-
     @Override
     public Component getName(ItemStack stack) {
         String text = Component.literal("Canteen").getString();
@@ -52,7 +42,7 @@ public class UltimaCanteen extends Item {
         long time = System.currentTimeMillis() / 50;
 
         for (int i = 0; i < text.length(); i++) {
-            int color = waveGrayWhiteColor(time, i, 5.0);
+            int color = ColorUtils.waveGrayWhiteColor(time, i, 5.0);
             result = result.append(Component.literal(String.valueOf(text.charAt(i)))
                     .withStyle(style -> style.withColor(color)));
         }

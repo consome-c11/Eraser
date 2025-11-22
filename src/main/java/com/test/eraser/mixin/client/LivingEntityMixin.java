@@ -1,9 +1,8 @@
 package com.test.eraser.mixin.client;
 
 import com.test.eraser.client.ClientEvents;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.mixin.eraser.EntityAccessor;
-import com.test.eraser.mixin.eraser.LevelEntityGetterAdapterAccessor;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.HandleErasePacket;
 import net.minecraft.client.Minecraft;
@@ -12,17 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.entity.TransientEntitySectionManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @OnlyIn(Dist.CLIENT)
 @Mixin(LivingEntity.class)

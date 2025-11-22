@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SCS",
+    "CAC",
+    "SCS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:sugar"
+    },
+    "C": {
+      "item": "minecraft:cookie"
+    },
+    "A": {
+      "item": "minecraft:cake"
+    }
+  },
+  "result": {
+    "item": "c11eraser:null_ingot",
+    "count": 1
+  }
+}

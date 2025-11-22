@@ -1,7 +1,7 @@
 package com.test.eraser.entity;
 
 import com.test.eraser.additional.ModEntities;
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

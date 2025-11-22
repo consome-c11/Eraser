@@ -1,4 +1,4 @@
-package com.test.eraser.logic;
+package com.test.eraser.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;

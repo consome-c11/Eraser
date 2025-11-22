@@ -1,6 +1,6 @@
 package com.test.eraser.network;
 
-import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.ILivingEntity;
 import com.test.eraser.network.packets.EraseEntityPacket;
 import com.test.eraser.utils.TaskScheduler;
 import net.minecraft.client.Minecraft;
@@ -10,8 +10,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import static com.mojang.text2speech.Narrator.LOGGER;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
